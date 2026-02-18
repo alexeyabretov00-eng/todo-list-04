@@ -7,7 +7,7 @@ servers:
 paths:
   /lists:
     get:
-      summary: List all todo lists
+      summary: List all todo lists ordered by position
       responses:
         "200":
           description: Lists
@@ -17,6 +17,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TodoList"
+        "503":
+          description: Service unavailable — used by frontend to trigger FR-021 error state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
       summary: Create a new list
       requestBody:
@@ -33,7 +39,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/TodoList"
         "409":
-          description: Conflict
+          description: Conflict — duplicate list name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation error — name exceeds 255 chars or missing
           content:
             application/json:
               schema:
@@ -57,13 +69,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/TodoList"
         "409":
-          description: Conflict
+          description: Conflict — duplicate name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation error — title exceeds 255 chars or missing required field
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Delete a list
+      summary: Delete a list and all its todos and subitems
       parameters:
         - $ref: "#/components/parameters/ListId"
       responses:
@@ -113,7 +131,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/TodoItem"
         "409":
-          description: Conflict
+          description: Conflict — duplicate title within list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation error — title exceeds 255 chars or missing
           content:
             application/json:
               schema:
@@ -151,13 +175,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/TodoItem"
         "409":
-          description: Conflict
+          description: Conflict — duplicate title within list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation error — title exceeds 255 chars
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
-      summary: Delete a todo
+      summary: Delete a todo and all its subitems
       parameters:
         - $ref: "#/components/parameters/TodoId"
       responses:
@@ -195,7 +225,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/SubItem"
         "409":
-          description: Conflict
+          description: Conflict — duplicate title within todo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation error — title exceeds 255 chars or missing
           content:
             application/json:
               schema:
@@ -233,7 +269,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/SubItem"
         "409":
-          description: Conflict
+          description: Conflict — duplicate title within todo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: Validation error — title exceeds 255 chars
           content:
             application/json:
               schema:
@@ -303,12 +345,14 @@ components:
       properties:
         name:
           type: string
+          maxLength: 255
       required: [name]
     TodoListUpdate:
       type: object
       properties:
         name:
           type: string
+          maxLength: 255
         order:
           type: integer
     TodoItem:
@@ -336,12 +380,14 @@ components:
       properties:
         title:
           type: string
+          maxLength: 255
       required: [title]
     TodoItemUpdate:
       type: object
       properties:
         title:
           type: string
+          maxLength: 255
         completed:
           type: boolean
         order:
@@ -371,12 +417,14 @@ components:
       properties:
         title:
           type: string
+          maxLength: 255
       required: [title]
     SubItemUpdate:
       type: object
       properties:
         title:
           type: string
+          maxLength: 255
         completed:
           type: boolean
         order:

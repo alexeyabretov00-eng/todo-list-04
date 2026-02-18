@@ -5,65 +5,76 @@
 ### TodoList
 
 - **Fields**:
-  - `id` (string, unique)
-  - `name` (string, required, unique across lists)
-  - `order` (integer, required, >= 0)
-  - `createdAt` (timestamp, required)
-  - `updatedAt` (timestamp, required)
+  - `id` (string, UUID, unique)
+  - `name` (string, required, max 255 chars, unique across all lists)
+  - `position` (integer, required, >= 0, unique within all lists)
+  - `createdAt` (ISO 8601 timestamp, required)
+  - `updatedAt` (ISO 8601 timestamp, required, updated on every change)
 - **Relationships**:
-  - One TodoList has many TodoItems.
+  - One TodoList has many TodoItems (cascade delete).
 
 ### TodoItem
 
 - **Fields**:
-  - `id` (string, unique)
-  - `listId` (string, required, references TodoList)
-  - `title` (string, required, unique within list)
-  - `completed` (boolean, required)
-  - `order` (integer, required, >= 0)
-  - `createdAt` (timestamp, required)
-  - `updatedAt` (timestamp, required)
+  - `id` (string, UUID, unique)
+  - `listId` (string, required, foreign key → TodoList.id)
+  - `title` (string, required, max 255 chars, unique within parent list)
+  - `completed` (boolean, required, default false)
+  - `position` (integer, required, >= 0, unique within parent list)
+  - `createdAt` (ISO 8601 timestamp, required)
+  - `updatedAt` (ISO 8601 timestamp, required, updated on every change)
 - **Relationships**:
   - One TodoItem belongs to one TodoList.
-  - One TodoItem has many SubItems.
+  - One TodoItem has many SubItems (cascade delete).
 
 ### SubItem
 
 - **Fields**:
-  - `id` (string, unique)
-  - `todoId` (string, required, references TodoItem)
-  - `title` (string, required, unique within todo)
-  - `completed` (boolean, required)
-  - `order` (integer, required, >= 0)
-  - `createdAt` (timestamp, required)
-  - `updatedAt` (timestamp, required)
+  - `id` (string, UUID, unique)
+  - `todoId` (string, required, foreign key → TodoItem.id)
+  - `title` (string, required, max 255 chars, unique within parent todo)
+  - `completed` (boolean, required, default false)
+  - `position` (integer, required, >= 0, unique within parent todo)
+  - `createdAt` (ISO 8601 timestamp, required)
+  - `updatedAt` (ISO 8601 timestamp, required, updated on every change)
 - **Relationships**:
   - One SubItem belongs to one TodoItem.
 
-### OfflineOperation (queue)
+### OfflineOperation (client-side queue, stored in IndexedDB)
 
 - **Fields**:
-  - `id` (string, unique)
-  - `entityType` (enum: list | todo | subitem)
-  - `operation` (enum: create | update | delete | reorder)
+  - `id` (string, UUID, unique)
+  - `entityType` (enum: `list` | `todo` | `subitem`)
+  - `operation` (enum: `create` | `update` | `delete` | `reorder`)
   - `entityId` (string, required)
-  - `payload` (json, required)
-  - `clientTimestamp` (timestamp, required)
-  - `idempotencyKey` (string, required)
+  - `payload` (JSON object, required — full updated field values)
+  - `clientTimestamp` (ISO 8601 timestamp, required — used for last-write-wins comparison)
+  - `idempotencyKey` (string, required — prevents duplicate application on retry)
+- **Storage**: IndexedDB only; MUST NOT be stored in Redux or localStorage.
+- **Lifecycle**: Operations are appended while offline; flushed to `POST /sync/operations` when connectivity returns; removed from queue on successful `applied` response.
 
 ## Validation Rules
 
-- List names are required and must be unique across lists.
-- Todo titles are required and must be unique within their list.
-- Subitem titles are required and must be unique within their parent todo.
-- `order` values are non-negative integers and are unique within their parent scope.
-- `completed` is required for todos and subitems.
-- `updatedAt` is updated on any change for last-write-wins resolution.
+- List `name`: required, max 255 chars, unique across all lists (Zod + SQLite UNIQUE index).
+- TodoItem `title`: required, max 255 chars, unique within parent list (Zod + SQLite UNIQUE index on `(listId, title)`).
+- SubItem `title`: required, max 255 chars, unique within parent todo (Zod + SQLite UNIQUE index on `(todoId, title)`).
+- `position` values are non-negative integers, unique within their parent scope; renumbered on conflict after offline replay.
+- `completed` defaults to `false`; required on create.
+- `updatedAt` MUST be updated on every mutation for last-write-wins conflict resolution.
+- Titles exceeding 255 characters MUST be rejected with HTTP 422 and an inline validation error message.
 
 ## State Transitions
 
-- Marking a todo complete marks all its subitems complete.
-- Marking any subitem incomplete marks its parent todo incomplete.
-- When all subitems become complete, the parent todo is auto-completed.
-- Deleting a todo removes all subitems immediately.
-- Offline operations are applied in order; conflicts resolve by last-write-wins based on `updatedAt`/`clientTimestamp`.
+- **Mark todo complete** (FR-005): all subitems `completed` → `true`.
+- **Mark todo incomplete** (FR-005a): subitems retain their individual `completed` state unchanged.
+- **Mark subitem incomplete** (FR-006): parent todo `completed` → `false`.
+- **All subitems complete** (FR-017): parent todo `completed` → `true` automatically.
+- **Delete todo** (FR-018): all child SubItems deleted immediately (cascade); no undo.
+- **Delete list** (FR-018): all child TodoItems and their SubItems deleted immediately (cascade); no undo.
+- **Offline sync conflict** (FR-013): if `clientTimestamp` < current server `updatedAt`, operation is skipped (server wins); result returned as `conflicted` in SyncResponse.
+
+## Empty & Error States
+
+- **No lists in app** (FR-020): frontend MUST render `EmptyState` with add-list call-to-action.
+- **List has no todos** (FR-020): frontend MUST render `EmptyState` with add-todo call-to-action.
+- **Startup load failure** (FR-021): frontend MUST render `ErrorBanner` with retry button; stale or empty data MUST NOT be displayed.

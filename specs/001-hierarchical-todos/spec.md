@@ -15,6 +15,14 @@
 - Q: Should a parent todo auto-complete when all subitems are complete? → A: Parent auto-completes when all subitems complete
 - Q: Should deletes support undo? → A: Immediate delete (no undo)
 
+### Session 2026-02-18
+
+- Q: When a todo is marked incomplete, what happens to its subitems? → A: Subitems keep their current completion state (only the parent todo changes)
+- Q: What is the maximum allowed title length for lists, todos, and subitems? → A: 255 characters
+- Q: What should the app display when a list has no todos yet? → A: Show a placeholder message (e.g. "No todos yet — add one to get started") with a visible add button
+- Q: Should `updatedAt` be tracked on all three entity types for conflict detection? → A: Yes — `updatedAt` on TodoList, TodoItem, and SubItem
+- Q: What should the app show when data fails to load on startup? → A: Show an error message with a retry button; do not display stale or empty data
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Create lists with nested tasks (Priority: P1)
@@ -64,11 +72,13 @@ As a user, I want to rename or remove lists, todos, and subitems so I can keep m
 
 - Deleting a todo that has subitems removes the entire subtree without orphaned data.
 - Marking a parent todo complete while subitems are incomplete results in all subitems being completed.
+- Marking a parent todo incomplete does not change the completion state of its subitems; each subitem retains its individual state.
 - When the final subitem is completed, the parent todo becomes completed automatically.
 - Deleted lists, todos, and subitems are removed immediately with no undo.
-- A list with no todos remains visible and can accept new items.
-- Very long titles are stored without data loss and remain associated with the correct item.
+- A list with no todos remains visible, displays a placeholder empty-state message, and shows a visible add-todo button.
+- Titles up to 255 characters are stored without data loss and remain associated with the correct item; titles exceeding 255 characters are rejected at input with a validation error.
 - If offline edits conflict on sync, the most recent change is retained.
+- If the app fails to load data on startup due to a network or API error, an error message and retry button are shown; the app MUST NOT render an empty list state or partial data.
 
 ## Requirements *(mandatory)*
 
@@ -79,6 +89,7 @@ As a user, I want to rename or remove lists, todos, and subitems so I can keep m
 - **FR-003**: Users MUST be able to add, edit, and delete subitems under a todo item.
 - **FR-004**: Users MUST be able to mark todos and subitems as complete or incomplete.
 - **FR-005**: When a todo is marked complete, all its subitems MUST be marked complete.
+- **FR-005a**: When a todo is marked incomplete, its subitems MUST retain their individual completion state unchanged.
 - **FR-006**: When any subitem is marked incomplete, the parent todo MUST be marked incomplete.
 - **FR-007**: The app MUST work without user accounts or sign-in.
 - **FR-008**: The app MUST be usable on both desktop and mobile screens.
@@ -92,12 +103,15 @@ As a user, I want to rename or remove lists, todos, and subitems so I can keep m
 - **FR-016**: Subitem titles MUST be unique within their parent todo.
 - **FR-017**: When all subitems are complete, the parent todo MUST be marked complete automatically.
 - **FR-018**: Deleting lists, todos, or subitems MUST remove them immediately with no undo.
+- **FR-019**: Titles for lists, todos, and subitems MUST NOT exceed 255 characters; input exceeding this limit MUST be rejected with an inline validation error.
+- **FR-020**: When a list contains no todos, the app MUST display a placeholder message and a visible add-todo button. When the app contains no lists, the app MUST display a placeholder message and a visible add-list button.
+- **FR-021**: When the app fails to load data on startup (e.g. API unreachable), it MUST display an error message and a retry button; stale or empty data MUST NOT be silently presented.
 
 ### Key Entities *(include if feature involves data)*
 
-- **TodoList**: A user-defined collection of todo items; attributes include name and user-defined ordering.
-- **TodoItem**: A task within a list; attributes include title, completion status, user-defined ordering, and its subitems.
-- **SubItem**: A child task under a todo item; attributes include title, completion status, and user-defined ordering.
+- **TodoList**: A user-defined collection of todo items; attributes include name (max 255 chars, required), user-defined ordering, and `updatedAt` timestamp.
+- **TodoItem**: A task within a list; attributes include title (max 255 chars, required), completion status, user-defined ordering, `updatedAt` timestamp, and its subitems.
+- **SubItem**: A child task under a todo item; attributes include title (max 255 chars, required), completion status, user-defined ordering, and `updatedAt` timestamp.
 
 ### Assumptions
 
