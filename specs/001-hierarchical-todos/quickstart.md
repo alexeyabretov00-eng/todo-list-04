@@ -78,7 +78,7 @@ Open [http://localhost:3000](http://localhost:3000) in a browser.
 4. Add a todo item titled "Buy groceries". Verify it appears.
 5. Add a subitem titled "Milk" under "Buy groceries". Verify the hierarchy is preserved.
 6. Mark "Buy groceries" complete. Verify "Milk" is also marked complete.
-7. Unmark "Buy groceries". Verify "Milk" retains its completed state (FR-005a).
+7. Unmark "Buy groceries". Verify "Milk" retains its completed state (FR-022).
 8. Mark "Milk" incomplete. Verify "Buy groceries" becomes incomplete (FR-006).
 9. Mark "Milk" complete again. Verify "Buy groceries" auto-completes (FR-017).
 10. Rename "Home" to "Groceries". Verify the updated name is displayed.

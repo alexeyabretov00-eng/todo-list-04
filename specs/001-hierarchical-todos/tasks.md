@@ -21,8 +21,8 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T004 [P] Configure backend TypeScript in backend/tsconfig.json
 - [ ] T005 [P] Configure frontend TypeScript + path aliases in frontend/tsconfig.json
 - [ ] T006 [P] Configure Webpack build and alias resolution in frontend/webpack.config.js
-- [ ] T007 [P] Configure ESLint + Prettier for frontend in frontend/.eslintrc.cjs and frontend/.prettierrc
-- [ ] T008 [P] Configure ESLint + Prettier for backend in backend/.eslintrc.cjs and backend/.prettierrc
+- [ ] T007 [P] Configure ESLint + Prettier for frontend in frontend/.eslintrc.cjs and frontend/.prettierrc — MUST enable `eslint-plugin-simple-import-sort` rules; MUST add a rule disallowing wildcard imports (`import *`) and wildcard re-exports (`export * from`) per constitution §V
+- [ ] T008 [P] Configure ESLint + Prettier for backend in backend/.eslintrc.cjs and backend/.prettierrc — MUST add a rule disallowing wildcard imports (`import *`) and wildcard re-exports (`export * from`) per constitution §V
 - [ ] T009 [P] Configure Jest in frontend/jest.config.ts and backend/jest.config.ts — MUST include `coverageThreshold: { global: { lines: 80, branches: 80, functions: 80, statements: 80 } }` to enforce constitution §IV ≥80% coverage gate; add `"test:coverage": "jest --coverage"` npm script to both packages
 - [ ] T010 [P] Configure Storybook in frontend/.storybook/main.ts and frontend/.storybook/preview.ts
 - [ ] T011 [P] Add commitlint configuration in commitlint.config.cjs

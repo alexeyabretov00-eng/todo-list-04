@@ -331,7 +331,7 @@ components:
           type: string
         name:
           type: string
-        order:
+        position:
           type: integer
         createdAt:
           type: string
@@ -339,7 +339,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-      required: [id, name, order, createdAt, updatedAt]
+      required: [id, name, position, createdAt, updatedAt]
     TodoListCreate:
       type: object
       properties:
@@ -353,7 +353,7 @@ components:
         name:
           type: string
           maxLength: 255
-        order:
+        position:
           type: integer
     TodoItem:
       type: object
@@ -366,7 +366,7 @@ components:
           type: string
         completed:
           type: boolean
-        order:
+        position:
           type: integer
         createdAt:
           type: string
@@ -374,7 +374,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-      required: [id, listId, title, completed, order, createdAt, updatedAt]
+      required: [id, listId, title, completed, position, createdAt, updatedAt]
     TodoItemCreate:
       type: object
       properties:
@@ -390,7 +390,7 @@ components:
           maxLength: 255
         completed:
           type: boolean
-        order:
+        position:
           type: integer
     SubItem:
       type: object
@@ -403,7 +403,7 @@ components:
           type: string
         completed:
           type: boolean
-        order:
+        position:
           type: integer
         createdAt:
           type: string
@@ -411,7 +411,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-      required: [id, todoId, title, completed, order, createdAt, updatedAt]
+      required: [id, todoId, title, completed, position, createdAt, updatedAt]
     SubItemCreate:
       type: object
       properties:
@@ -427,7 +427,7 @@ components:
           maxLength: 255
         completed:
           type: boolean
-        order:
+        position:
           type: integer
     ReorderRequest:
       type: object

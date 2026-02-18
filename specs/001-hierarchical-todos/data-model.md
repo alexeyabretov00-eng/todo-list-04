@@ -66,7 +66,7 @@
 ## State Transitions
 
 - **Mark todo complete** (FR-005): all subitems `completed` → `true`.
-- **Mark todo incomplete** (FR-005a): subitems retain their individual `completed` state unchanged.
+- **Mark todo incomplete** (FR-022): subitems retain their individual `completed` state unchanged.
 - **Mark subitem incomplete** (FR-006): parent todo `completed` → `false`.
 - **All subitems complete** (FR-017): parent todo `completed` → `true` automatically.
 - **Delete todo** (FR-018): all child SubItems deleted immediately (cascade); no undo.
