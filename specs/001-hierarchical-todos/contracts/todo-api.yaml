@@ -1,0 +1,453 @@
+openapi: 3.0.3
+info:
+  title: Hierarchical Todo API
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /lists:
+    get:
+      summary: List all todo lists
+      responses:
+        "200":
+          description: Lists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TodoList"
+    post:
+      summary: Create a new list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TodoListCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodoList"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /lists/{listId}:
+    patch:
+      summary: Update list details
+      parameters:
+        - $ref: "#/components/parameters/ListId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TodoListUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodoList"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a list
+      parameters:
+        - $ref: "#/components/parameters/ListId"
+      responses:
+        "204":
+          description: Deleted
+  /lists/reorder:
+    post:
+      summary: Reorder lists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderRequest"
+      responses:
+        "200":
+          description: Reordered
+  /lists/{listId}/todos:
+    get:
+      summary: List todos in a list
+      parameters:
+        - $ref: "#/components/parameters/ListId"
+      responses:
+        "200":
+          description: Todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TodoItem"
+    post:
+      summary: Create a todo in a list
+      parameters:
+        - $ref: "#/components/parameters/ListId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TodoItemCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodoItem"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /lists/{listId}/todos/reorder:
+    post:
+      summary: Reorder todos within a list
+      parameters:
+        - $ref: "#/components/parameters/ListId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderRequest"
+      responses:
+        "200":
+          description: Reordered
+  /todos/{todoId}:
+    patch:
+      summary: Update a todo
+      parameters:
+        - $ref: "#/components/parameters/TodoId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TodoItemUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodoItem"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a todo
+      parameters:
+        - $ref: "#/components/parameters/TodoId"
+      responses:
+        "204":
+          description: Deleted
+  /todos/{todoId}/subitems:
+    get:
+      summary: List subitems for a todo
+      parameters:
+        - $ref: "#/components/parameters/TodoId"
+      responses:
+        "200":
+          description: Subitems
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubItem"
+    post:
+      summary: Create a subitem
+      parameters:
+        - $ref: "#/components/parameters/TodoId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubItemCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubItem"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /todos/{todoId}/subitems/reorder:
+    post:
+      summary: Reorder subitems within a todo
+      parameters:
+        - $ref: "#/components/parameters/TodoId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderRequest"
+      responses:
+        "200":
+          description: Reordered
+  /subitems/{subItemId}:
+    patch:
+      summary: Update a subitem
+      parameters:
+        - $ref: "#/components/parameters/SubItemId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubItemUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubItem"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a subitem
+      parameters:
+        - $ref: "#/components/parameters/SubItemId"
+      responses:
+        "204":
+          description: Deleted
+  /sync/operations:
+    post:
+      summary: Apply queued offline operations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncRequest"
+      responses:
+        "200":
+          description: Sync results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncResponse"
+components:
+  parameters:
+    ListId:
+      name: listId
+      in: path
+      required: true
+      schema:
+        type: string
+    TodoId:
+      name: todoId
+      in: path
+      required: true
+      schema:
+        type: string
+    SubItemId:
+      name: subItemId
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    TodoList:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        order:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, name, order, createdAt, updatedAt]
+    TodoListCreate:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [name]
+    TodoListUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        order:
+          type: integer
+    TodoItem:
+      type: object
+      properties:
+        id:
+          type: string
+        listId:
+          type: string
+        title:
+          type: string
+        completed:
+          type: boolean
+        order:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, listId, title, completed, order, createdAt, updatedAt]
+    TodoItemCreate:
+      type: object
+      properties:
+        title:
+          type: string
+      required: [title]
+    TodoItemUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        completed:
+          type: boolean
+        order:
+          type: integer
+    SubItem:
+      type: object
+      properties:
+        id:
+          type: string
+        todoId:
+          type: string
+        title:
+          type: string
+        completed:
+          type: boolean
+        order:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [id, todoId, title, completed, order, createdAt, updatedAt]
+    SubItemCreate:
+      type: object
+      properties:
+        title:
+          type: string
+      required: [title]
+    SubItemUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        completed:
+          type: boolean
+        order:
+          type: integer
+    ReorderRequest:
+      type: object
+      properties:
+        orderedIds:
+          type: array
+          items:
+            type: string
+      required: [orderedIds]
+    SyncRequest:
+      type: object
+      properties:
+        operations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Operation"
+      required: [operations]
+    SyncResponse:
+      type: object
+      properties:
+        applied:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationResult"
+        failed:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationResult"
+      required: [applied, failed]
+    Operation:
+      type: object
+      properties:
+        id:
+          type: string
+        entityType:
+          type: string
+          enum: [list, todo, subitem]
+        operation:
+          type: string
+          enum: [create, update, delete, reorder]
+        entityId:
+          type: string
+        payload:
+          type: object
+        clientTimestamp:
+          type: string
+          format: date-time
+        idempotencyKey:
+          type: string
+      required: [id, entityType, operation, entityId, payload, clientTimestamp, idempotencyKey]
+    OperationResult:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [applied, conflicted, failed]
+        serverEntity:
+          type: object
+        error:
+          $ref: "#/components/schemas/Error"
+      required: [id, status]
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required: [code, message]
