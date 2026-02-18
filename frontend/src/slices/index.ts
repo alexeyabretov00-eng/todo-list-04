@@ -44,3 +44,13 @@ export {
 } from './todosSlice';
 export type { UiState } from './uiSlice';
 export { selectList, uiSlice } from './uiSlice';
+export type { SyncState, SyncStatus as SyncStatus } from './syncSlice';
+export {
+  clearFailedIds,
+  setOnline,
+  setPendingCount,
+  setSynced,
+  setSyncError,
+  setSyncing,
+  syncSlice,
+} from './syncSlice';

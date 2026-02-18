@@ -71,6 +71,7 @@ function makeStore(overrides: {
       }),
       subitems: () => ({ byTodoId, loading: false, error: null }),
       ui: () => ({ selectedListId }),
+      sync: () => ({ isOnline: true, syncStatus: 'idle', pendingCount: 0, failedIds: [] }),
     },
   });
 }
@@ -125,6 +126,7 @@ describe('getTodoListsViewContainerProps selector', () => {
       },
       subitems: { byTodoId: {}, loading: false, error: null },
       ui: { selectedListId: LIST_ID },
+      sync: { isOnline: true, syncStatus: 'idle' as const, pendingCount: 0, failedIds: [] },
     };
     const result = getTodoListsViewContainerProps(state);
     expect(result.todos).toHaveLength(1);
@@ -142,6 +144,7 @@ describe('getTodoListsViewContainerProps selector', () => {
       },
       subitems: { byTodoId: {}, loading: false, error: null },
       ui: { selectedListId: null },
+      sync: { isOnline: true, syncStatus: 'idle' as const, pendingCount: 0, failedIds: [] },
     };
     const result = getTodoListsViewContainerProps(state);
     expect(result.todos).toHaveLength(0);

@@ -33,10 +33,12 @@ interface ListsState { items: TodoList[]; loading: boolean; error: string | null
 interface TodosState { byListId: Record<string, unknown>; loading: boolean; error: string | null }
 interface SubItemsState { byTodoId: Record<string, unknown>; loading: boolean; error: string | null }
 interface UiState { selectedListId: string | null }
+interface SyncState { isOnline: boolean; syncStatus: string; pendingCount: number; failedIds: string[] }
 
 const defaultTodos: TodosState = { byListId: {}, loading: false, error: null };
 const defaultSubItems: SubItemsState = { byTodoId: {}, loading: false, error: null };
 const defaultUi: UiState = { selectedListId: null };
+const defaultSync: SyncState = { isOnline: true, syncStatus: 'idle', pendingCount: 0, failedIds: [] };
 
 function makeStore(lists: ListsState) {
   return configureStore({
@@ -45,8 +47,9 @@ function makeStore(lists: ListsState) {
       todos: (s: TodosState = defaultTodos): TodosState => s,
       subitems: (s: SubItemsState = defaultSubItems): SubItemsState => s,
       ui: (s: UiState = defaultUi): UiState => s,
+      sync: (s: SyncState = defaultSync): SyncState => s,
     },
-    preloadedState: { lists, todos: defaultTodos, subitems: defaultSubItems, ui: defaultUi },
+    preloadedState: { lists, todos: defaultTodos, subitems: defaultSubItems, ui: defaultUi, sync: defaultSync },
   });
 }
 

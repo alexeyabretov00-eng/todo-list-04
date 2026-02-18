@@ -1,4 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
+import type { SyncStatus } from '@slices';
 import type { RootState } from '@store';
 
 // ─── AppContainer selectors ───────────────────────────────────────────────────
@@ -8,6 +9,10 @@ export interface AppContainerProps {
   selectedListId: string | null;
   loading: boolean;
   error: string | null;
+  isOnline: boolean;
+  syncStatus: SyncStatus;
+  pendingCount: number;
+  failedIds: string[];
 }
 
 export const getAppContainerProps = createSelector(
@@ -15,11 +20,19 @@ export const getAppContainerProps = createSelector(
   (state: RootState) => state.ui.selectedListId,
   (state: RootState) => state.lists.loading,
   (state: RootState) => state.lists.error,
-  (lists, selectedListId, loading, error): AppContainerProps => ({
+  (state: RootState) => state.sync.isOnline,
+  (state: RootState) => state.sync.syncStatus,
+  (state: RootState) => state.sync.pendingCount,
+  (state: RootState) => state.sync.failedIds,
+  (lists, selectedListId, loading, error, isOnline, syncStatus, pendingCount, failedIds): AppContainerProps => ({
     lists,
     selectedListId,
     loading,
     error,
+    isOnline,
+    syncStatus,
+    pendingCount,
+    failedIds,
   })
 );
 

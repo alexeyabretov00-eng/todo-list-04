@@ -1,6 +1,6 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { listsSlice, subItemsSlice, todosSlice, uiSlice } from '@slices';
+import { listsSlice, subItemsSlice, syncSlice, todosSlice, uiSlice } from '@slices';
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 // Each slice lives in store/slices/<name>Slice.ts.
@@ -12,6 +12,7 @@ export const store = configureStore({
     todos: todosSlice.reducer,
     subitems: subItemsSlice.reducer,
     ui: uiSlice.reducer,
+    sync: syncSlice.reducer,
   },
   // No persistence middleware — state is ephemeral per spec
 });

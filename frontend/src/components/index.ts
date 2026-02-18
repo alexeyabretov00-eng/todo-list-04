@@ -7,6 +7,8 @@ export type { ReorderListItemData } from './ReorderList';
 export { ReorderList } from './ReorderList';
 export { SubItemForm } from './SubItemForm';
 export { SubItemRow } from './SubItemRow';
+export type { SyncStatusProps } from './SyncStatus';
+export { SyncStatus } from './SyncStatus';
 export { TodoItemForm } from './TodoItemForm';
 export { TodoItemRow } from './TodoItemRow';
 export { TodoListView } from './TodoListView';

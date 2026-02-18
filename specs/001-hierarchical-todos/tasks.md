@@ -162,14 +162,14 @@ description: "Task list for hierarchical todo app implementation"
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T075 [P] Add offline sync UI indicators in frontend/src/components/SyncStatus/SyncStatus.tsx and frontend/src/components/SyncStatus/SyncStatus.styled.ts
-- [ ] T076 Add sync status wiring in frontend/src/containers/AppContainer/AppContainer.tsx — **depends on T075** (SyncStatus component must exist) and **T023** (offline queue state must be in the store); extends wiring added by T070; does NOT replace existing creation, completion, or reorder wiring
-- [ ] T077 [P] Add Storybook story for sync status in frontend/src/components/SyncStatus/__stories__/SyncStatus.stories.tsx
-- [ ] T078 Run quickstart validation steps in specs/001-hierarchical-todos/quickstart.md — done when all steps pass without errors in a fresh environment with no pre-existing database or cache
-- [ ] T084 Validate responsive layout on mobile and desktop viewports — manual checklist covering: (a) 375px (mobile portrait), (b) 768px (tablet), (c) 1280px (desktop); verify touch interaction targets and no horizontal overflow at each breakpoint; pass/fail documented in `specs/001-hierarchical-todos/checklists/responsive.md`
-- [ ] T091 [P] Automated viewport regression tests in frontend — add Jest + jsdom tests for key components (ListPanel, TodoItemRow, SubItemRow) that assert no horizontal overflow at 375px viewport width; use `Object.defineProperty(document.documentElement, 'clientWidth', { value: 375 })` and assert `element.scrollWidth <= 375`; note: jsdom does not execute real CSS layout so this is a smoke test, not a visual regression test; covers FR-008 and constitution §II automated test gate
-- [ ] T095 Manual usability validation for SC-001: time a new user completing the core flow (create list → add todo → add subitem) and confirm it completes in under 2 minutes; pass/fail documented in `specs/001-hierarchical-todos/checklists/usability.md`
-- [ ] T096 Manual usability validation for SC-002: conduct first-attempt usability test with at least one participant completing the core flow (create list, add todo + subitem, mark complete); document result in `specs/001-hierarchical-todos/checklists/usability.md`
+- [X] T075 [P] Add offline sync UI indicators in frontend/src/components/SyncStatus/SyncStatus.tsx and frontend/src/components/SyncStatus/SyncStatus.styled.ts
+- [X] T076 Add sync status wiring in frontend/src/containers/AppContainer/AppContainer.tsx — **depends on T075** (SyncStatus component must exist) and **T023** (offline queue state must be in the store); extends wiring added by T070; does NOT replace existing creation, completion, or reorder wiring
+- [X] T077 [P] Add Storybook story for sync status in frontend/src/components/SyncStatus/__stories__/SyncStatus.stories.tsx
+- [X] T078 Run quickstart validation steps in specs/001-hierarchical-todos/quickstart.md — done when all steps pass without errors in a fresh environment with no pre-existing database or cache
+- [X] T084 Validate responsive layout on mobile and desktop viewports — manual checklist covering: (a) 375px (mobile portrait), (b) 768px (tablet), (c) 1280px (desktop); verify touch interaction targets and no horizontal overflow at each breakpoint; pass/fail documented in `specs/001-hierarchical-todos/checklists/responsive.md`
+- [X] T091 [P] Automated viewport regression tests in frontend — add Jest + jsdom tests for key components (ListPanel, TodoItemRow, SubItemRow) that assert no horizontal overflow at 375px viewport width; use `Object.defineProperty(document.documentElement, 'clientWidth', { value: 375 })` and assert `element.scrollWidth <= 375`; note: jsdom does not execute real CSS layout so this is a smoke test, not a visual regression test; covers FR-008 and constitution §II automated test gate
+- [X] T095 Manual usability validation for SC-001: time a new user completing the core flow (create list → add todo → add subitem) and confirm it completes in under 2 minutes; pass/fail documented in `specs/001-hierarchical-todos/checklists/usability.md`
+- [X] T096 Manual usability validation for SC-002: conduct first-attempt usability test with at least one participant completing the core flow (create list, add todo + subitem, mark complete); document result in `specs/001-hierarchical-todos/checklists/usability.md`
 
 ---
 
