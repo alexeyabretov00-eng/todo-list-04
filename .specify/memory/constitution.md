@@ -31,12 +31,12 @@ React components MUST be "stupid" (presentational), with containers handling dat
 
 ### Frontend Stack
 - **Framework**: React 19.x (SPA), TypeScript (strict mode), PWA-enabled
-- **Build**: Webpack with ts-loader, typescript-plugin-styled-components
-- **State Management**: Redux Toolkit (no persistence to localStorage)
+- **Build**: Webpack with ts-loader for ts/tsx, typescript-plugin-styled-components, NOT USE babel, NOT USE css-loader, style-loader, because we use styled-components
+- **State Management**: Redux Toolkit (no persistence to localStorage), NO USE RTK Query
 - **Styling**: styled-components, Ant Design component library, write own components only its not exists in Ant Design component library
 - **Forms & Validation**: react-hook-form, Zod schemas
 - **API Client**: fetch API (no CORS, same domain, dev proxy configured)
-- **Testing**: Jest (≥80% coverage), Storybook for component documentation
+- **Testing**: Jest (≥80% coverage), USE ts-jest, Storybook for component documentation
 - **Linting/Formatting**: ESLint, Prettier, eslint-plugin-simple-import-sort, commitlint
 - **Packages**: NPM, All npm packages MUST HAVE latest versions, Do not use prefixes in package's versions
 - **Module Resolution**: Path aliases configured in tsconfig.json and bundler:

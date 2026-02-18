@@ -50,8 +50,9 @@
   - `payload` (JSON object, required — full updated field values)
   - `clientTimestamp` (ISO 8601 timestamp, required — used for last-write-wins comparison)
   - `idempotencyKey` (string, required — prevents duplicate application on retry)
+  - `retryCount` (integer, required, default 0 — incremented on each failed sync attempt; max 3 per FR-010)
 - **Storage**: IndexedDB only; MUST NOT be stored in Redux or localStorage.
-- **Lifecycle**: Operations are appended while offline; flushed to `POST /sync/operations` when connectivity returns; removed from queue on successful `applied` response.
+- **Lifecycle**: Operations are appended while offline; flushed to `POST /api/sync` when connectivity returns; removed from queue on successful `applied` response.
 
 ## Validation Rules
 
@@ -71,7 +72,7 @@
 - **All subitems complete** (FR-017): parent todo `completed` → `true` automatically.
 - **Delete todo** (FR-018): all child SubItems deleted immediately (cascade); no undo.
 - **Delete list** (FR-018): all child TodoItems and their SubItems deleted immediately (cascade); no undo.
-- **Offline sync conflict** (FR-013): if `clientTimestamp` < current server `updatedAt`, operation is skipped (server wins); result returned as `conflicted` in SyncResponse.
+- **Offline sync conflict** (FR-013): if `clientTimestamp` < current server `updatedAt`, operation is skipped (server wins); result returned as `conflicted` in SyncResponse. If `clientTimestamp` equals server `updatedAt`, the server-received (already-applied) operation MUST be preferred (server wins).
 
 ## Empty & Error States
 

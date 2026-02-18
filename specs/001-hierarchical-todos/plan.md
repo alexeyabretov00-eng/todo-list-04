@@ -12,9 +12,9 @@ Deliver a single-user hierarchical todo app that supports lists, todos, and subi
 ## Technical Context
 
 **Language/Version**: TypeScript (strict mode) for frontend, Node.js (latest LTS) for backend
-**Primary Dependencies**: React 19.x, Redux Toolkit, styled-components, Ant Design, react-hook-form, Zod, Webpack, Jest, Storybook, better-sqlite3
+**Primary Dependencies**: React 19.x, Redux Toolkit, styled-components, Ant Design, react-hook-form, Zod, Webpack (ts-loader, typescript-plugin-styled-components), Jest (ts-jest), Storybook, better-sqlite3
 **Storage**: SQLite via better-sqlite3 (embedded, single-user); DB file at `backend/data/todos.db`; migrations via custom runner in `backend/src/services/migrations/`
-**Testing**: Jest (≥80% coverage), Storybook stories co-located with components
+**Testing**: Jest (≥80% coverage, ts-jest transform), Storybook stories co-located with components
 **Target Platform**: Web (desktop + mobile), PWA-enabled
 **Project Type**: web (frontend + backend)
 **Performance Goals**: UI interactions (toggle completion, rename, delete) MUST respond within 150ms at up to 200 todos and 500 subitems (no perceived lag); offline sync completes within 30 seconds after reconnect; see SC-004 for data-integrity gate at that scale
@@ -30,7 +30,8 @@ Deliver a single-user hierarchical todo app that supports lists, todos, and subi
 - API-driven state; no local persistence except offline sync queue (persisted to IndexedDB). (Pass)
 - Test-first quality with Jest ≥80% coverage, co-located tests and stories. (Pass)
 - Presentational components with container logic; TypeScript strict; styled-components. (Pass)
-- React 19 + Redux Toolkit + Ant Design; fetch API client; Webpack build. (Pass)
+- React 19 + Redux Toolkit + Ant Design; fetch API client (NO RTK Query per constitution §III); Webpack build (ts-loader; no Babel; typescript-plugin-styled-components). (Pass)
+- ts-jest configured as Jest transformer; no Babel in test pipeline. (Pass)
 - Named imports/exports only; container naming conventions. (Pass)
 
 **Post-Design Re-check**: No changes required; all constitution gates still pass.
@@ -96,9 +97,11 @@ frontend/
 │   └── manifest.json               # PWA manifest
 ├── src/
 │   ├── api/
-│   │   ├── baseApi.ts              # RTK Query base API
-│   │   └── todoApi.ts              # All endpoints: lists, todos, subitems, sync
-│   │                               # Final exports: use[Entity][Action] RTK Query hooks
+│   │   ├── apiClient.ts            # Shared fetch wrapper (base URL, error handling)
+│   │   ├── listsApi.ts             # List CRUD + reorder — plain fetch calls
+│   │   ├── todosApi.ts             # Todo CRUD + reorder + completion — plain fetch calls
+│   │   ├── subitemsApi.ts          # Subitem CRUD + reorder + completion — plain fetch calls
+│   │   └── syncApi.ts              # Offline sync endpoint — plain fetch call
 │   ├── components/
 │   │   ├── ListForm/
 │   │   ├── TodoItemForm/
@@ -122,15 +125,16 @@ frontend/
 │   │   ├── offlineCache.ts         # PWA asset caching strategy
 │   │   └── serviceWorker.ts        # Service worker registration
 │   ├── store/
-│   │   └── store.ts                # Redux store — NO persistence middleware (constitution §III)
+│   │   ├── store.ts                # Redux store — NO persistence middleware (constitution §III)
+│   │   └── thunks.ts               # Async thunks for read (fetchLists/Todos/Subitems) and write (create, rename, delete, reorder, toggleComplete) operations
 │   ├── styles/
 │   │   └── globalStyles.ts
 │   └── types/
 │       └── todos.ts                # Shared TypeScript types
-└── tests/
 ```
+*(All frontend tests are co-located in `__tests__/` folders adjacent to their artifact — no top-level `tests/` directory; constitution §IV.)*
 
-**Structure Decision**: Web application split into `frontend/` and `backend/` to align with React SPA + Node REST API requirements. `todoApi.ts` is a single file grown across implementation phases (T074 → T039 → T040 → T041 → T055 → T067); its final exported shape is `use[Entity][Action]` RTK Query hooks. Directory layout matches constitution standards for components, containers, and selectors.
+**Structure Decision**: Web application split into `frontend/` and `backend/` to align with React SPA + Node REST API requirements. The `@api` layer uses plain `fetch` calls (no RTK Query — constitution §III) split into per-entity files (`listsApi.ts`, `todosApi.ts`, `subitemsApi.ts`, `syncApi.ts`) sharing a common `apiClient.ts` wrapper. Redux store holds all fetched data as ephemeral session state. Directory layout matches constitution standards for components, containers, and selectors.
 
 ## Complexity Tracking
 

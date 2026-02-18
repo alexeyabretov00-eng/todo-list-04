@@ -20,11 +20,11 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T003 Initialize frontend package and scripts in frontend/package.json — all dependency versions MUST be exact (no `^` or `~` prefixes); install latest stable versions at time of creation
 - [ ] T004 [P] Configure backend TypeScript in backend/tsconfig.json
 - [ ] T005 [P] Configure frontend TypeScript + path aliases in frontend/tsconfig.json
-- [ ] T006 [P] Configure Webpack build and alias resolution in frontend/webpack.config.js
+- [ ] T006 [P] Configure Webpack build and alias resolution in frontend/webpack.config.js — MUST use `ts-loader` for all `.ts`/`.tsx` files; MUST include `typescript-plugin-styled-components` as a `ts-loader` custom transformer; MUST NOT add Babel, css-loader, or style-loader (constitution §II); configure all path aliases from `@components`, `@hooks`, `@utils`, `@api`, `@styles`, `@assets`, `@services`, `@types` to match tsconfig.json
 - [ ] T007 [P] Configure ESLint + Prettier for frontend in frontend/.eslintrc.cjs and frontend/.prettierrc — MUST enable `eslint-plugin-simple-import-sort` rules; MUST add a rule disallowing wildcard imports (`import *`) and wildcard re-exports (`export * from`) per constitution §V
 - [ ] T008 [P] Configure ESLint + Prettier for backend in backend/.eslintrc.cjs and backend/.prettierrc — MUST add a rule disallowing wildcard imports (`import *`) and wildcard re-exports (`export * from`) per constitution §V
-- [ ] T009 [P] Configure Jest in frontend/jest.config.ts and backend/jest.config.ts — MUST include `coverageThreshold: { global: { lines: 80, branches: 80, functions: 80, statements: 80 } }` to enforce constitution §IV ≥80% coverage gate; add `"test:coverage": "jest --coverage"` npm script to both packages
-- [ ] T010 [P] Configure Storybook in frontend/.storybook/main.ts and frontend/.storybook/preview.ts
+- [ ] T009 [P] Configure Jest in frontend/jest.config.ts and backend/jest.config.ts — MUST set `transform: { '^.+\.tsx?$': 'ts-jest' }` (constitution §IV; NO Babel transform); MUST include `coverageThreshold: { global: { lines: 80, branches: 80, functions: 80, statements: 80 } }` to enforce constitution §IV ≥80% coverage gate; add `"test:coverage": "jest --coverage"` npm script to both packages; ensure `ts-jest` is listed as a dev dependency in T002/T003
+- [ ] T010 [P] Configure Storybook in frontend/.storybook/main.ts and frontend/.storybook/preview.ts — MUST use `@storybook/builder-webpack5` with the project Webpack config (reuse `webpack.config.js`); MUST NOT use Babel transforms (constitution §II); configure `typescript-plugin-styled-components` via the shared Webpack config so styled-components display names are correct in stories
 - [ ] T011 [P] Add commitlint configuration in commitlint.config.cjs
 - [ ] T012 [P] Add environment templates in frontend/.env.example and backend/.env.example
 - [ ] T079 [P] Add PWA manifest in frontend/public/manifest.json
@@ -43,21 +43,21 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T015 [P] Implement backend error handling middleware in backend/src/api/errorHandler.ts
 - [ ] T016 [P] Configure SQLite connection in backend/src/services/db.ts
 - [ ] T017 [P] Define data models in backend/src/models/todoList.ts, backend/src/models/todoItem.ts, backend/src/models/subItem.ts
-- [ ] T018 [P] Define offline queue model in backend/src/models/offlineOperation.ts — model MUST enumerate all operation types: `create`, `update` (rename), `delete`, and `reorder`; include `entityType` (`list` | `todo` | `subitem`), `entityId`, `payload`, `updatedAt`, and `retryCount` fields
+- [ ] T018 [P] Define offline queue model in backend/src/models/offlineOperation.ts — model MUST enumerate all operation types: `create`, `update` (rename), `delete`, and `reorder`; include `entityType` (`list` | `todo` | `subitem`), `entityId`, `payload`, `clientTimestamp`, `idempotencyKey`, and `retryCount` fields
 - [ ] T019 Create Zod validation schemas in backend/src/services/validation.ts — covers list name unique across app, todo title unique within list, subitem title unique within todo; Zod schemas only (`z.string().max(255)` etc.); does NOT own DDL — DB-layer uniqueness is owned exclusively by T082
 - [ ] T082 Create database schema and migrations in backend/src/services/migrations/ — **sole owner of all DDL**; MUST include UNIQUE constraints (list.name, todo title+listId, subitem title+todoId) as SQLite UNIQUE index definitions; T019 Zod schemas must mirror these constraints but T082 is the authoritative source
 - [ ] T020 [P] Create shared frontend types in frontend/src/types/todos.ts
-- [ ] T021 [P] Create Redux store in frontend/src/store/store.ts
-- [ ] T022 [P] Create RTK Query base API in frontend/src/api/baseApi.ts
-- [ ] T023 [P] Create offline queue service in frontend/src/services/offlineQueue.ts
+- [ ] T021 [P] Create Redux store in frontend/src/store/store.ts — MUST define slices for: `lists` (`{ items: TodoList[], loading: boolean, error: string | null }`), `todos` (`{ byListId: Record<string, TodoItem[]>, loading: boolean }`), `subitems` (`{ byTodoId: Record<string, SubItem[]>, loading: boolean }`), and `ui` (`{ selectedListId: string | null }`); NO persistence middleware (constitution §III); slices populated by dispatching thunks defined in T092 (Phase 3)
+- [ ] T022 [P] Create shared fetch API client in frontend/src/api/apiClient.ts — base URL from `API_PATH` env var, common error handling (throw on non-2xx), JSON serialisation; NO RTK Query (constitution §III); **this is a thin wrapper only — no retry or backoff logic here**; retry/backoff for failed sync operations is exclusively the responsibility of T023 (offlineQueue)
+- [ ] T023 [P] Create offline queue service in frontend/src/services/offlineQueue.ts — owns all retry logic for failed operations (up to 3 retries with exponential backoff per FR-010); reads/writes to IndexedDB; calls `syncApi.ts` (T074) on reconnect; on 3 consecutive failures surfaces an error to the user; **does not depend on `apiClient.ts` retry behaviour** (see T022)
 - [ ] T089 [P] Unit tests for offline queue service in frontend/src/services/__tests__/offlineQueue.test.ts — MUST be completed before T023 is considered done (TDD gate); validates FR-010: (a) pending operation is written to IndexedDB when offline, (b) queue is read and dispatched on reconnect, (c) successfully synced operations are removed from the queue
 - [ ] T072 [P] Add offline sync endpoint implementation in backend/src/api/sync.ts
 - [ ] T073 [P] Add offline sync service implementation in backend/src/services/syncService.ts — MUST implement last-write-wins by comparing timestamps on conflicting operations (see T086 for test coverage)
 - [ ] T086 [P] Unit tests for last-write-wins conflict resolution in backend/tests/unit/syncConflict.test.ts — validates FR-013: when two operations modify the same item, the one with the most recent `updatedAt` timestamp wins after sync; MUST be completed before T073 is considered done (TDD gate)
 - [ ] T090 [P] Unit/integration test for AppContainer startup data-load sequence in frontend/src/containers/AppContainer/__tests__/AppContainer.test.tsx — validates FR-011: (a) `GET /api/lists` is called on component mount, (b) returned list data is rendered, (c) loading state is shown while request is in-flight; complements T088 which covers the error path only; also MUST assert (d) when API returns an empty array, the add-list CTA (button/placeholder) is visible — covers the no-lists half of FR-020
-- [ ] T074 [P] Wire offline sync to RTK Query in frontend/src/api/todoApi.ts — **creates the file shell** (baseApi injection, sync mutation); T039/T040/T041 extend this file in that order
-- [ ] T024 [P] Create selectors in frontend/src/selectors/containers.ts
-- [ ] T025 [P] Create root AppContainer in frontend/src/containers/AppContainer/AppContainer.tsx and frontend/src/containers/AppContainer/AppContainer.styled.ts
+- [ ] T074 [P] Create offline sync API call in frontend/src/api/syncApi.ts — single `postSyncBatch(operations)` function using `apiClient.ts`; dispatches queued operations to `POST /api/sync`; plain fetch, no RTK Query (constitution §III)
+- [ ] T024 [P] Create selectors in frontend/src/selectors/containers.ts — **depends on T021 slice definitions being finalised**; implement `getAppContainerProps` (selects lists, ui.selectedListId, ui.loading, ui.error) and `getTodoListsViewContainerProps` (selects todos and subitems for selectedListId)
+- [ ] T025 [P] Create root AppContainer in frontend/src/containers/AppContainer/AppContainer.tsx and frontend/src/containers/AppContainer/AppContainer.styled.ts — MUST dispatch a `fetchLists` thunk (calling `listsApi.getAll()`) in a `useEffect` on mount to satisfy FR-011; show loading state while in-flight; on error render ErrorBanner (T088) with retry callback that re-dispatches the thunk
 - [ ] T026 [P] Create global styles in frontend/src/styles/globalStyles.ts
 
 ---
@@ -85,18 +85,21 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T036 [P] [US1] Implement list routes in backend/src/api/lists.ts
 - [ ] T037 [P] [US1] Implement todo routes in backend/src/api/todos.ts
 - [ ] T038 [P] [US1] Implement subitem routes in backend/src/api/subitems.ts
-- [ ] T039 [US1] Add list endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — **extends file created by T074; run after T074**
-- [ ] T040 [US1] Add todo endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T039
-- [ ] T041 [US1] Add subitem endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T040
+- [ ] T039 [P] [US1] Create list API service in frontend/src/api/listsApi.ts — plain fetch functions for list CRUD + reorder using `apiClient.ts`; depends on T022; can run in parallel with T040 and T041
+- [ ] T040 [P] [US1] Create todo API service in frontend/src/api/todosApi.ts — plain fetch functions for todo CRUD + reorder + completion using `apiClient.ts`; depends on T022; can run in parallel with T039 and T041
+- [ ] T041 [P] [US1] Create subitem API service in frontend/src/api/subitemsApi.ts — plain fetch functions for subitem CRUD + reorder + completion using `apiClient.ts`; depends on T022; can run in parallel with T039 and T040
+- [ ] T092 [P] [US1] Create Redux async thunks in frontend/src/store/thunks.ts — **cross-phase task: depends on T021 (slices, Phase 2) and T039–T041 (API services, Phase 3)**; implement read thunks: `fetchLists()`, `fetchTodos(listId)`, `fetchSubitems(todoId)`; implement write/mutation thunks: `createList(name)`, `createTodo(listId, title)`, `createSubitem(todoId, title)`, `toggleComplete(entityType, id)`, `renameItem(entityType, id, title)`, `deleteItem(entityType, id)`, `reorderItems(entityType, parentId, orderedIds)`; all thunks call the corresponding API service function and dispatch into the appropriate slice
 - [ ] T042 [P] [US1] Create ListForm component in frontend/src/components/ListForm/ListForm.tsx and frontend/src/components/ListForm/ListForm.styled.ts — MUST display inline validation error when a duplicate list name is entered (Zod + react-hook-form); mirrors FR-014
 - [ ] T043 [P] [US1] Create TodoItemForm component in frontend/src/components/TodoItemForm/TodoItemForm.tsx and frontend/src/components/TodoItemForm/TodoItemForm.styled.ts — MUST display inline validation error when a duplicate todo title is entered within the same list (Zod + react-hook-form); mirrors FR-015; MUST reject titles exceeding 255 characters with an inline error; mirrors FR-019
 - [ ] T044 [P] [US1] Create SubItemForm component in frontend/src/components/SubItemForm/SubItemForm.tsx and frontend/src/components/SubItemForm/SubItemForm.styled.ts — MUST display inline validation error when a duplicate subitem title is entered within the same todo (Zod + react-hook-form); mirrors FR-016; MUST reject titles exceeding 255 characters with an inline error; mirrors FR-019
-- [ ] T045 [P] [US1] Create ListPanel component in frontend/src/components/ListPanel/ListPanel.tsx and frontend/src/components/ListPanel/ListPanel.styled.ts
-- [ ] T046 [P] [US1] Create TodoListView component in frontend/src/components/TodoListView/TodoListView.tsx and frontend/src/components/TodoListView/TodoListView.styled.ts
-- [ ] T047 [US1] Wire list/todo/subitem creation in frontend/src/containers/AppContainer/AppContainer.tsx
-- [ ] T087 [US1] Create TodoListsViewContainer in frontend/src/containers/TodoListsViewContainer/TodoListsViewContainer.tsx and frontend/src/containers/TodoListsViewContainer/TodoListsViewContainer.styled.ts — renders the active list's todos and subitems; add `getTodoListsViewContainerProps` selector in frontend/src/selectors/containers.ts
+- [ ] T094 [P] [US1] Create EmptyState component in frontend/src/components/EmptyState/EmptyState.tsx and frontend/src/components/EmptyState/EmptyState.styled.ts — reusable placeholder used wherever a list is empty; accepts `message: string`, `ctaLabel: string`, and `onCta: () => void` props; mirrors FR-020; component test in frontend/src/components/EmptyState/__tests__/EmptyState.test.tsx MUST cover: (a) renders message text, (b) renders CTA button with correct label, (c) onCta callback fires on button click
+- [ ] T045 [P] [US1] Create ListPanel component in frontend/src/components/ListPanel/ListPanel.tsx and frontend/src/components/ListPanel/ListPanel.styled.ts — uses EmptyState (T094) to display placeholder + add-list CTA when no lists exist (FR-020); depends on T094
+- [ ] T046 [P] [US1] Create TodoListView component in frontend/src/components/TodoListView/TodoListView.tsx and frontend/src/components/TodoListView/TodoListView.styled.ts — uses EmptyState (T094) to display placeholder + add-todo CTA when the active list has no todos (FR-020); depends on T094
+- [ ] T047 [US1] Wire list/todo/subitem creation in frontend/src/containers/AppContainer/AppContainer.tsx — extends wiring added by T025; dispatches create/add thunks for lists, todos, subitems; does NOT replace existing mount/fetch wiring
+- [ ] T093 [P] [US1] Component/integration tests for TodoListsViewContainer in frontend/src/containers/TodoListsViewContainer/__tests__/TodoListsViewContainer.test.tsx — MUST cover: (a) renders todos and subitems for the selected list, (b) shows empty-state placeholder with add-todo button when list has no todos (FR-020), (c) selector `getTodoListsViewContainerProps` returns correct shape for given store state; MUST be completed before T087 is considered done (TDD gate)
+- [ ] T087 [US1] Create TodoListsViewContainer in frontend/src/containers/TodoListsViewContainer/TodoListsViewContainer.tsx and frontend/src/containers/TodoListsViewContainer/TodoListsViewContainer.styled.ts — renders the active list's todos and subitems; MUST dispatch `fetchTodos(selectedListId)` when the selected list changes (via `useEffect` on `selectedListId`) and `fetchSubitems(todoId)` as each todo row expands; uses EmptyState (T094) to display placeholder + add-todo CTA when the active list has no todos (FR-020); add `getTodoListsViewContainerProps` selector in frontend/src/selectors/containers.ts
 - [ ] T088 [P] [US1] Create ErrorBanner component in frontend/src/components/ErrorBanner/ErrorBanner.tsx and frontend/src/components/ErrorBanner/ErrorBanner.styled.ts — renders error message and a retry button; used by AppContainer when `GET /api/lists` returns a non-2xx response on startup; mirrors FR-021 and research Decision 9; component test in frontend/src/components/ErrorBanner/__tests__/ErrorBanner.test.tsx MUST cover: (a) banner renders with message and retry button, (b) onRetry callback fires on button click
-- [ ] T048 [P] [US1] Add Storybook stories for new components in frontend/src/components/ListForm/__stories__/ListForm.stories.tsx, frontend/src/components/ErrorBanner/__stories__/ErrorBanner.stories.tsx, and related files
+- [ ] T048 [P] [US1] Add Storybook stories for Phase 3 components — one story file per component, all co-located per constitution §IV: `frontend/src/components/EmptyState/__stories__/EmptyState.stories.tsx`, `frontend/src/components/ListForm/__stories__/ListForm.stories.tsx`, `frontend/src/components/TodoItemForm/__stories__/TodoItemForm.stories.tsx`, `frontend/src/components/SubItemForm/__stories__/SubItemForm.stories.tsx`, `frontend/src/components/ListPanel/__stories__/ListPanel.stories.tsx`, `frontend/src/components/TodoListView/__stories__/TodoListView.stories.tsx`, `frontend/src/components/ErrorBanner/__stories__/ErrorBanner.stories.tsx`
 
 **Checkpoint**: User Story 1 is functional and independently testable.
 
@@ -117,13 +120,13 @@ description: "Task list for hierarchical todo app implementation"
 ### Implementation for User Story 2
 
 - [ ] T052 [US2] Implement completion rules in backend/src/services/completionRules.ts
-- [ ] T053 [US2] Update todo/subitem services for completion logic in backend/src/services/todoService.ts and backend/src/services/subItemService.ts — **requires T041** (subitem RTK Query endpoints must exist before completion logic can be wired end-to-end)
-- [ ] T054 [US2] Expose completion updates in backend/src/api/todos.ts and backend/src/api/subitems.ts — **requires T041**
-- [ ] T055 [US2] Add completion mutations to frontend RTK Query in frontend/src/api/todoApi.ts
+- [ ] T053 [US2] Update todo/subitem services for completion logic in backend/src/services/todoService.ts and backend/src/services/subItemService.ts — **requires T038** (subitem routes must exist so completion logic can be tested end-to-end against the backend)
+- [ ] T054 [US2] Expose completion updates in backend/src/api/todos.ts and backend/src/api/subitems.ts — **requires T053** (completion service logic must be implemented before routes can expose it) and **requires T038**
+- [ ] T055 [US2] Add completion fetch functions to frontend/src/api/todosApi.ts and frontend/src/api/subitemsApi.ts — plain `PATCH` calls for toggle-complete; no RTK Query (constitution §III)
 - [ ] T056 [P] [US2] Create TodoItemRow component in frontend/src/components/TodoItemRow/TodoItemRow.tsx and frontend/src/components/TodoItemRow/TodoItemRow.styled.ts
 - [ ] T057 [P] [US2] Create SubItemRow component in frontend/src/components/SubItemRow/SubItemRow.tsx and frontend/src/components/SubItemRow/SubItemRow.styled.ts
-- [ ] T058 [US2] Wire completion toggles in frontend/src/containers/AppContainer/AppContainer.tsx
-- [ ] T059 [P] [US2] Add Storybook stories for completion components in frontend/src/components/TodoItemRow/__stories__/TodoItemRow.stories.tsx
+- [ ] T058 [US2] Wire completion toggles in frontend/src/containers/AppContainer/AppContainer.tsx — extends wiring added by T047; dispatches completion thunks; does NOT replace existing creation or mount wiring
+- [ ] T059 [P] [US2] Add Storybook stories for completion components: `frontend/src/components/TodoItemRow/__stories__/TodoItemRow.stories.tsx` and `frontend/src/components/SubItemRow/__stories__/SubItemRow.stories.tsx`
 
 **Checkpoint**: User Story 2 works independently with correct parent/child completion behavior.
 
@@ -147,11 +150,11 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T064 [US3] Implement reorder service in backend/src/services/reorderService.ts
 - [ ] T065 [US3] Add edit/delete routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
 - [ ] T066 [US3] Add reorder routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
-- [ ] T067 [US3] Add edit/reorder mutations in frontend/src/api/todoApi.ts
+- [ ] T067 [US3] Add rename/delete/reorder fetch functions to frontend/src/api/listsApi.ts, frontend/src/api/todosApi.ts, and frontend/src/api/subitemsApi.ts — plain `PATCH`/`DELETE` calls; no RTK Query (constitution §III)
 - [ ] T068 [P] [US3] Create InlineEdit component in frontend/src/components/InlineEdit/InlineEdit.tsx and frontend/src/components/InlineEdit/InlineEdit.styled.ts
 - [ ] T069 [P] [US3] Create ReorderList component in frontend/src/components/ReorderList/ReorderList.tsx and frontend/src/components/ReorderList/ReorderList.styled.ts — **custom component justified**: Ant Design's drag-sort is a Table variant unsuitable for plain ordered lists; a lightweight custom drag-and-drop list is required per constitution §V
-- [ ] T070 [US3] Wire edit/delete/reorder in frontend/src/containers/AppContainer/AppContainer.tsx
-- [ ] T071 [P] [US3] Add Storybook stories for editing components in frontend/src/components/InlineEdit/__stories__/InlineEdit.stories.tsx
+- [ ] T070 [US3] Wire edit/delete/reorder in frontend/src/containers/AppContainer/AppContainer.tsx — extends wiring added by T047 and T058; dispatches rename/delete/reorder thunks; does NOT replace existing creation or completion wiring
+- [ ] T071 [P] [US3] Add Storybook stories for editing components: `frontend/src/components/InlineEdit/__stories__/InlineEdit.stories.tsx` and `frontend/src/components/ReorderList/__stories__/ReorderList.stories.tsx`
 
 **Checkpoint**: User Story 3 works independently with rename/delete/reorder features.
 
@@ -160,11 +163,13 @@ description: "Task list for hierarchical todo app implementation"
 ## Phase 6: Polish & Cross-Cutting Concerns
 
 - [ ] T075 [P] Add offline sync UI indicators in frontend/src/components/SyncStatus/SyncStatus.tsx and frontend/src/components/SyncStatus/SyncStatus.styled.ts
-- [ ] T076 Add sync status wiring in frontend/src/containers/AppContainer/AppContainer.tsx
+- [ ] T076 Add sync status wiring in frontend/src/containers/AppContainer/AppContainer.tsx — **depends on T075** (SyncStatus component must exist) and **T023** (offline queue state must be in the store); extends wiring added by T070; does NOT replace existing creation, completion, or reorder wiring
 - [ ] T077 [P] Add Storybook story for sync status in frontend/src/components/SyncStatus/__stories__/SyncStatus.stories.tsx
 - [ ] T078 Run quickstart validation steps in specs/001-hierarchical-todos/quickstart.md — done when all steps pass without errors in a fresh environment with no pre-existing database or cache
-- [ ] T084 Validate responsive layout on mobile and desktop viewports — manual checklist covering: (a) 375px (mobile portrait), (b) 768px (tablet), (c) 1280px (desktop); verify touch interaction targets and no horizontal overflow at each breakpoint; pass/fail documented in checklist
-- [ ] T091 [P] Automated viewport regression tests in frontend — add Jest + jsdom tests for key components (ListPanel, TodoItemRow, SubItemRow) that assert layout does not break at 375px viewport width; covers FR-008 and constitution §II automated test gate
+- [ ] T084 Validate responsive layout on mobile and desktop viewports — manual checklist covering: (a) 375px (mobile portrait), (b) 768px (tablet), (c) 1280px (desktop); verify touch interaction targets and no horizontal overflow at each breakpoint; pass/fail documented in `specs/001-hierarchical-todos/checklists/responsive.md`
+- [ ] T091 [P] Automated viewport regression tests in frontend — add Jest + jsdom tests for key components (ListPanel, TodoItemRow, SubItemRow) that assert no horizontal overflow at 375px viewport width; use `Object.defineProperty(document.documentElement, 'clientWidth', { value: 375 })` and assert `element.scrollWidth <= 375`; note: jsdom does not execute real CSS layout so this is a smoke test, not a visual regression test; covers FR-008 and constitution §II automated test gate
+- [ ] T095 Manual usability validation for SC-001: time a new user completing the core flow (create list → add todo → add subitem) and confirm it completes in under 2 minutes; pass/fail documented in `specs/001-hierarchical-todos/checklists/usability.md`
+- [ ] T096 Manual usability validation for SC-002: conduct first-attempt usability test with at least one participant completing the core flow (create list, add todo + subitem, mark complete); document result in `specs/001-hierarchical-todos/checklists/usability.md`
 
 ---
 
@@ -184,7 +189,7 @@ description: "Task list for hierarchical todo app implementation"
 - **US3 (P3)**: Depends on Foundational and US1 entities; can be parallelized after US1 models/services.
 - **T086**: Must complete before T073 is considered done (TDD gate — syncService has no tests otherwise until Phase 4).
 - **T089**: Must complete before T023 is considered done (TDD gate — offlineQueue service has no tests otherwise).
-- **T041**: Must complete before T053 and T054 can be wired end-to-end (subitem RTK Query endpoints are required for completion logic; cross-phase dependency Phase 3 → Phase 4).
+- **T038**: Must complete before T053 and T054 can be wired end-to-end (backend subitem routes must exist so completion logic can be tested end-to-end; cross-phase dependency Phase 3 → Phase 4).
 
 ### Parallel Execution Examples
 
@@ -192,6 +197,8 @@ description: "Task list for hierarchical todo app implementation"
 
 - T027, T028, T029 can run in parallel (contract tests).
 - T033, T034, T035 can run in parallel (services).
+- T039, T040, T041 can run in parallel (frontend API service files; all depend only on T022).
+- T092 can run in parallel with other Phase 3 tasks once T039–T041 and T021 are both complete.
 - T042, T043, T044 can run in parallel (form components).
 - T045, T046, T088 can run in parallel (panel, list view, error banner components).
 
