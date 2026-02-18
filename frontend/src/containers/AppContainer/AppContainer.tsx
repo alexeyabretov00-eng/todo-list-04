@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { ErrorBanner, ListPanel } from '@components';
 import { TodoListsViewContainer } from '@containers';
 import { getAppContainerProps } from '@selectors';
-import { createList, fetchLists, selectList } from '@slices';
+import { createList, deleteList, fetchLists, renameList, reorderLists, selectList } from '@slices';
 import { useAppDispatch, useAppSelector } from '@store';
 import { Layout, Spin, Typography } from 'antd';
 
@@ -23,6 +23,22 @@ export function AppContainer(): React.ReactElement {
 
   const handleCreateList = (name: string) => {
     void dispatch(createList(name));
+  };
+
+  const handleRenameList = (id: string, name: string) => {
+    void dispatch(renameList({ id, name }));
+  };
+
+  const handleDeleteList = (id: string) => {
+    void dispatch(deleteList(id));
+    // If the deleted list was selected, clear the selection
+    if (selectedListId === id) {
+      dispatch(selectList(null));
+    }
+  };
+
+  const handleReorderLists = (orderedIds: string[]) => {
+    void dispatch(reorderLists(orderedIds));
   };
 
   if (loading) {
@@ -55,6 +71,9 @@ export function AppContainer(): React.ReactElement {
         selectedListId={selectedListId}
         onSelectList={handleSelectList}
         onCreateList={handleCreateList}
+        onRenameList={handleRenameList}
+        onDeleteList={handleDeleteList}
+        onReorderLists={handleReorderLists}
       />
       {selectedList ? (
         <TodoListsViewContainer listName={selectedList.name} />

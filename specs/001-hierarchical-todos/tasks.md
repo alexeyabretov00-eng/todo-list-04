@@ -140,21 +140,21 @@ description: "Task list for hierarchical todo app implementation"
 
 ### Tests for User Story 3
 
-- [ ] T060 [P] [US3] Contract tests for rename/delete in backend/tests/contract/editing.test.ts — MUST include assertion that `DELETE` completes without a confirmation step (i.e., a single request returns 200/204 with no intermediate confirm endpoint); mirrors FR-018
-- [ ] T061 [P] [US3] Contract tests for reorder in backend/tests/contract/reorder.test.ts
-- [ ] T062 [P] [US3] Component tests for edit/delete in frontend/src/components/InlineEdit/__tests__/InlineEdit.test.tsx — MUST assert that clicking delete does not render a confirmation modal/popover before the delete action fires; mirrors FR-018
+- [X] T060 [P] [US3] Contract tests for rename/delete in backend/tests/contract/editing.test.ts — MUST include assertion that `DELETE` completes without a confirmation step (i.e., a single request returns 200/204 with no intermediate confirm endpoint); mirrors FR-018
+- [X] T061 [P] [US3] Contract tests for reorder in backend/tests/contract/reorder.test.ts
+- [X] T062 [P] [US3] Component tests for edit/delete in frontend/src/components/InlineEdit/__tests__/InlineEdit.test.tsx — MUST assert that clicking delete does not render a confirmation modal/popover before the delete action fires; mirrors FR-018
 
 ### Implementation for User Story 3
 
-- [ ] T063 [US3] Extend listService, todoService, and subItemService to add rename (PATCH) and delete operations in backend/src/services/listService.ts, backend/src/services/todoService.ts, backend/src/services/subItemService.ts — builds on CRUD scaffolding from T033/T034/T035; do not duplicate existing create/read methods
-- [ ] T064 [US3] Implement reorder service in backend/src/services/reorderService.ts
-- [ ] T065 [US3] Add edit/delete routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
-- [ ] T066 [US3] Add reorder routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
-- [ ] T067 [US3] Add rename/delete/reorder fetch functions to frontend/src/api/listsApi.ts, frontend/src/api/todosApi.ts, and frontend/src/api/subitemsApi.ts — plain `PATCH`/`DELETE` calls; no RTK Query (constitution §III)
-- [ ] T068 [P] [US3] Create InlineEdit component in frontend/src/components/InlineEdit/InlineEdit.tsx and frontend/src/components/InlineEdit/InlineEdit.styled.ts
-- [ ] T069 [P] [US3] Create ReorderList component in frontend/src/components/ReorderList/ReorderList.tsx and frontend/src/components/ReorderList/ReorderList.styled.ts — **custom component justified**: Ant Design's drag-sort is a Table variant unsuitable for plain ordered lists; a lightweight custom drag-and-drop list is required per constitution §V
-- [ ] T070 [US3] Wire edit/delete/reorder in frontend/src/containers/AppContainer/AppContainer.tsx — extends wiring added by T047 and T058; dispatches rename/delete/reorder thunks; does NOT replace existing creation or completion wiring
-- [ ] T071 [P] [US3] Add Storybook stories for editing components: `frontend/src/components/InlineEdit/__stories__/InlineEdit.stories.tsx` and `frontend/src/components/ReorderList/__stories__/ReorderList.stories.tsx`
+- [X] T063 [US3] Extend listService, todoService, and subItemService to add rename (PATCH) and delete operations in backend/src/services/listService.ts, backend/src/services/todoService.ts, backend/src/services/subItemService.ts — builds on CRUD scaffolding from T033/T034/T035; do not duplicate existing create/read methods
+- [X] T064 [US3] Implement reorder service in backend/src/services/reorderService.ts
+- [X] T065 [US3] Add edit/delete routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
+- [X] T066 [US3] Add reorder routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
+- [X] T067 [US3] Add rename/delete/reorder fetch functions to frontend/src/api/listsApi.ts, frontend/src/api/todosApi.ts, and frontend/src/api/subitemsApi.ts — plain `PATCH`/`DELETE` calls; no RTK Query (constitution §III)
+- [X] T068 [P] [US3] Create InlineEdit component in frontend/src/components/InlineEdit/InlineEdit.tsx and frontend/src/components/InlineEdit/InlineEdit.styled.ts
+- [X] T069 [P] [US3] Create ReorderList component in frontend/src/components/ReorderList/ReorderList.tsx and frontend/src/components/ReorderList/ReorderList.styled.ts — **custom component justified**: Ant Design's drag-sort is a Table variant unsuitable for plain ordered lists; a lightweight custom drag-and-drop list is required per constitution §V
+- [X] T070 [US3] Wire edit/delete/reorder in frontend/src/containers/AppContainer/AppContainer.tsx — extends wiring added by T047 and T058; dispatches rename/delete/reorder thunks; does NOT replace existing creation or completion wiring
+- [X] T071 [P] [US3] Add Storybook stories for editing components: `frontend/src/components/InlineEdit/__stories__/InlineEdit.stories.tsx` and `frontend/src/components/ReorderList/__stories__/ReorderList.stories.tsx`
 
 **Checkpoint**: User Story 3 works independently with rename/delete/reorder features.
 
