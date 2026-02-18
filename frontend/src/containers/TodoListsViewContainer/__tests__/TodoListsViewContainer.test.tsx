@@ -8,11 +8,10 @@
  */
 
 import { Provider } from 'react-redux';
+import { TodoListsViewContainer } from '@containers';
 import { configureStore } from '@reduxjs/toolkit';
+import { getTodoListsViewContainerProps } from '@selectors';
 import { render, screen } from '@testing-library/react';
-
-import { getTodoListsViewContainerProps } from '../../../selectors/containers';
-import { TodoListsViewContainer } from '../TodoListsViewContainer';
 
 // ─── Module mocks ─────────────────────────────────────────────────────────────
 

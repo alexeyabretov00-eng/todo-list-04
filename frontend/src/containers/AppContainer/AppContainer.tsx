@@ -1,17 +1,12 @@
 import React, { useEffect } from 'react';
+import { ErrorBanner, ListPanel } from '@components';
+import { TodoListsViewContainer } from '@containers';
+import { getAppContainerProps } from '@selectors';
 import { createList, fetchLists, selectList } from '@slices';
 import { useAppDispatch, useAppSelector } from '@store';
+import { Layout, Spin, Typography } from 'antd';
 
-import { ErrorBanner } from '../../components/ErrorBanner';
-import { ListPanel } from '../../components/ListPanel';
-import { getAppContainerProps } from '../../selectors/containers';
-import { TodoListsViewContainer } from '../TodoListsViewContainer';
-
-import {
-  AppWrapper,
-  FullPageCenter,
-  LoadingIndicator,
-} from './AppContainer.styled';
+const { Text } = Typography;
 
 export function AppContainer(): React.ReactElement {
   const dispatch = useAppDispatch();
@@ -32,27 +27,29 @@ export function AppContainer(): React.ReactElement {
 
   if (loading) {
     return (
-      <FullPageCenter>
-        <LoadingIndicator role="status" aria-label="Loading lists…" />
-      </FullPageCenter>
+      <Layout style={{ minHeight: '100vh', alignItems: 'center', justifyContent: 'center' }}>
+        <span role="status" aria-label="Loading lists…">
+          <Spin size="large" />
+        </span>
+      </Layout>
     );
   }
 
   if (error) {
     return (
-      <FullPageCenter>
+      <Layout style={{ minHeight: '100vh', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <ErrorBanner
           message={error}
           onRetry={() => void dispatch(fetchLists())}
         />
-      </FullPageCenter>
+      </Layout>
     );
   }
 
   const selectedList = lists.find((l) => l.id === selectedListId) ?? null;
 
   return (
-    <AppWrapper>
+    <Layout style={{ minHeight: '100vh' }}>
       <ListPanel
         lists={lists}
         selectedListId={selectedListId}
@@ -62,14 +59,14 @@ export function AppContainer(): React.ReactElement {
       {selectedList ? (
         <TodoListsViewContainer listName={selectedList.name} />
       ) : (
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p style={{ color: '#8c8c8c' }}>
+        <Layout.Content style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Text type="secondary">
             {lists.length === 0
               ? 'Create a list to get started.'
               : 'Select a list to view tasks.'}
-          </p>
-        </div>
+          </Text>
+        </Layout.Content>
       )}
-    </AppWrapper>
+    </Layout>
   );
 }

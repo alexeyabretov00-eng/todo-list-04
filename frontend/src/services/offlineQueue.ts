@@ -15,10 +15,9 @@
  * Does NOT use apiClient retry logic — that is a thin HTTP wrapper only (T022).
  */
 
+import { postSyncBatch } from '@api';
 import type { IDBPDatabase } from 'idb';
 import { openDB } from 'idb';
-
-import { postSyncBatch } from '../api/syncApi';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 

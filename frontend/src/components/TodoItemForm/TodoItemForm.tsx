@@ -4,11 +4,8 @@
  */
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, Form, Input, Space } from 'antd';
 import { z } from 'zod';
-
-import { ErrorText, FormWrapper, InputRow, StyledInput, SubmitButton } from './TodoItemForm.styled';
 
 interface TodoItemFormProps {
   onSubmit: (title: string) => void;
@@ -27,40 +24,46 @@ const buildSchema = (existingTitles: string[]) =>
       ),
   });
 
-type FormValues = { title: string };
-
 export function TodoItemForm({ onSubmit, existingTitles }: TodoItemFormProps): React.ReactElement {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(buildSchema(existingTitles)),
-  });
+  const [form] = Form.useForm<{ title: string }>();
 
-  const handleValid = (data: FormValues) => {
-    onSubmit(data.title);
-    reset();
+  const handleFinish = (values: { title: string }) => {
+    onSubmit(values.title);
+    form.resetFields();
   };
 
   return (
-    <FormWrapper onSubmit={handleSubmit(handleValid)} noValidate>
-      <InputRow>
-        <label htmlFor="todo-title-input" className="sr-only">
-          Todo title
-        </label>
-        <StyledInput
-          id="todo-title-input"
-          aria-label="Todo title"
-          placeholder="New todo title…"
-          {...register('title')}
-        />
-        <SubmitButton type="submit">Add Todo</SubmitButton>
-      </InputRow>
-      {errors.title && (
-        <ErrorText role="alert">{errors.title.message}</ErrorText>
-      )}
-    </FormWrapper>
+    <Form form={form} onFinish={handleFinish} layout="vertical" style={{ padding: '8px 0' }}>
+      <Form.Item
+        name="title"
+        rules={[
+          { required: true, message: <span role="alert">Todo title is required</span> },
+          { max: 255, message: <span role="alert">Todo title must not exceed 255 characters</span> },
+          {
+            validator: (_, value: string) => {
+              const result = buildSchema(existingTitles).safeParse({ title: value ?? '' });
+              if (!result.success) {
+                const msg = result.error.issues[0]?.message;
+                if (msg && msg !== 'Todo title is required' && msg !== 'Todo title must not exceed 255 characters') {
+                  return Promise.reject(<span role="alert">{msg}</span>);
+                }
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <Space.Compact style={{ width: '100%' }}>
+          <Input
+            id="todo-title-input"
+            aria-label="Todo title"
+            placeholder="New todo title…"
+          />
+          <Button type="primary" htmlType="submit">
+            Add Todo
+          </Button>
+        </Space.Compact>
+      </Form.Item>
+    </Form>
   );
 }

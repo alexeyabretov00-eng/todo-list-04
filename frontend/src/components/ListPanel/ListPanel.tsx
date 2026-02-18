@@ -4,11 +4,11 @@
  */
 
 import React from 'react';
+import { EmptyState, ListForm } from '@components';
+import { Layout, Menu, Typography } from 'antd';
 
-import { EmptyState } from '../EmptyState';
-import { ListForm } from '../ListForm';
-
-import { ListItem, PanelTitle, PanelWrapper } from './ListPanel.styled';
+const { Sider } = Layout;
+const { Title } = Typography;
 
 interface ListPanelProps {
   lists: TodoList[];
@@ -26,34 +26,30 @@ export function ListPanel({
   const existingNames = lists.map((l) => l.name);
 
   return (
-    <PanelWrapper>
-      <PanelTitle>Lists</PanelTitle>
+    <Sider width={260} theme="light" style={{ borderRight: '1px solid #f0f0f0', padding: '16px 0', overflowY: 'auto' }}>
+      <Title level={5} style={{ padding: '0 16px', marginBottom: 8 }}>Lists</Title>
 
       {lists.length === 0 ? (
         <EmptyState
           message="No lists yet."
           ctaLabel="Add List"
           onCta={() => {
-            // Focus the list form — the form is always shown below
             document.getElementById('list-name-input')?.focus();
           }}
         />
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {lists.map((list) => (
-            <li key={list.id}>
-              <ListItem
-                $active={list.id === selectedListId}
-                onClick={() => onSelectList(list.id)}
-              >
-                {list.name}
-              </ListItem>
-            </li>
-          ))}
-        </ul>
+        <Menu
+          mode="inline"
+          selectedKeys={selectedListId ? [selectedListId] : []}
+          items={lists.map((list) => ({ key: list.id, label: list.name }))}
+          onClick={({ key }) => onSelectList(key)}
+          style={{ border: 'none' }}
+        />
       )}
 
-      <ListForm onSubmit={onCreateList} existingNames={existingNames} />
-    </PanelWrapper>
+      <div style={{ padding: '0 16px' }}>
+        <ListForm onSubmit={onCreateList} existingNames={existingNames} />
+      </div>
+    </Sider>
   );
 }

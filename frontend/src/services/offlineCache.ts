@@ -16,7 +16,27 @@
  * It is NOT imported by the main application bundle — it runs in its own SW context.
  */
 
-declare const self: ServiceWorkerGlobalScope;
+// Minimal ambient declarations for Service Worker types (not available in DOM lib)
+declare class ExtendableEvent extends Event {
+  waitUntil(f: Promise<unknown>): void;
+}
+declare class FetchEvent extends ExtendableEvent {
+  readonly request: Request;
+  respondWith(r: Promise<Response> | Response): void;
+}
+interface ServiceWorkerClients {
+  claim(): Promise<void>;
+}
+interface ServiceWorkerGlobalScope {
+  skipWaiting(): Promise<void>;
+  readonly clients: ServiceWorkerClients;
+  addEventListener(type: 'install', listener: (event: ExtendableEvent) => void): void;
+  addEventListener(type: 'activate', listener: (event: ExtendableEvent) => void): void;
+  addEventListener(type: 'fetch', listener: (event: FetchEvent) => void): void;
+}
+
+// self is ServiceWorkerGlobalScope in the SW execution context
+const sw = self as unknown as ServiceWorkerGlobalScope;
 
 const STATIC_CACHE = 'static-v1';
 const API_CACHE = 'api-v1';
@@ -32,7 +52,7 @@ function isApiRequest(url: URL): boolean {
 }
 
 // --- Install: pre-cache the app shell ---
-self.addEventListener('install', (event: ExtendableEvent) => {
+sw.addEventListener('install', (event: ExtendableEvent) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then(cache =>
       cache.addAll([
@@ -42,11 +62,11 @@ self.addEventListener('install', (event: ExtendableEvent) => {
     ),
   );
   // Take control immediately without waiting for existing tabs to close
-  self.skipWaiting();
+  sw.skipWaiting();
 });
 
 // --- Activate: clean up old caches ---
-self.addEventListener('activate', (event: ExtendableEvent) => {
+sw.addEventListener('activate', (event: ExtendableEvent) => {
   const currentCaches = [STATIC_CACHE, API_CACHE];
   event.waitUntil(
     caches.keys().then(cacheNames =>
@@ -58,11 +78,11 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
     ),
   );
   // Take control of all open clients
-  self.clients.claim();
+  sw.clients.claim();
 });
 
 // --- Fetch: route requests to the correct strategy ---
-self.addEventListener('fetch', (event: FetchEvent) => {
+sw.addEventListener('fetch', (event: FetchEvent) => {
   const url = new URL(event.request.url);
 
   if (isApiRequest(url)) {

@@ -5,13 +5,11 @@
  */
 
 import React, { useEffect } from 'react';
+import { ErrorBanner, TodoListView } from '@components';
+import { getTodoListsViewContainerProps } from '@selectors';
 import { createSubItem, createTodo, fetchSubItems, fetchTodos } from '@slices';
 import { useAppDispatch, useAppSelector } from '@store';
-
-import { ErrorBanner } from '../../components/ErrorBanner';
-import { TodoListView } from '../../components/TodoListView';
-import { getTodoListsViewContainerProps } from '../../selectors/containers';
-import { LoadingIndicator } from '../AppContainer/AppContainer.styled';
+import { Spin } from 'antd';
 
 interface TodoListsViewContainerProps {
   listName: string;
@@ -49,7 +47,11 @@ export function TodoListsViewContainer({
   };
 
   if (loading) {
-    return <LoadingIndicator role="status" aria-label="Loading todos…" />;
+    return (
+      <span role="status" aria-label="Loading todos…" style={{ display: 'block', margin: '20vh auto', textAlign: 'center' }}>
+        <Spin size="large" />
+      </span>
+    );
   }
 
   if (error) {

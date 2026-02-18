@@ -1,15 +1,12 @@
 /**
  * T042 – ListForm component
- * Controlled form with Zod + react-hook-form validation.
+ * Controlled form with Zod validation via antd Form.
  * Displays inline error for duplicate list name (FR-014) and 255-char limit (FR-019).
  */
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, Form, Input, Space } from 'antd';
 import { z } from 'zod';
-
-import { ErrorText, FormWrapper, InputRow, StyledInput, SubmitButton } from './ListForm.styled';
 
 interface ListFormProps {
   onSubmit: (name: string) => void;
@@ -28,40 +25,46 @@ const buildSchema = (existingNames: string[]) =>
       ),
   });
 
-type FormValues = { name: string };
-
 export function ListForm({ onSubmit, existingNames }: ListFormProps): React.ReactElement {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(buildSchema(existingNames)),
-  });
+  const [form] = Form.useForm<{ name: string }>();
 
-  const handleValid = (data: FormValues) => {
-    onSubmit(data.name);
-    reset();
+  const handleFinish = (values: { name: string }) => {
+    onSubmit(values.name);
+    form.resetFields();
   };
 
   return (
-    <FormWrapper onSubmit={handleSubmit(handleValid)} noValidate>
-      <InputRow>
-        <label htmlFor="list-name-input" className="sr-only">
-          List name
-        </label>
-        <StyledInput
-          id="list-name-input"
-          aria-label="List name"
-          placeholder="New list name…"
-          {...register('name')}
-        />
-        <SubmitButton type="submit">Add List</SubmitButton>
-      </InputRow>
-      {errors.name && (
-        <ErrorText role="alert">{errors.name.message}</ErrorText>
-      )}
-    </FormWrapper>
+    <Form form={form} onFinish={handleFinish} layout="vertical" style={{ padding: '8px 0' }}>
+      <Form.Item
+        name="name"
+        rules={[
+          { required: true, message: <span role="alert">List name is required</span> },
+          { max: 255, message: <span role="alert">List name must not exceed 255 characters</span> },
+          {
+            validator: (_, value: string) => {
+              const result = buildSchema(existingNames).safeParse({ name: value ?? '' });
+              if (!result.success) {
+                const msg = result.error.issues[0]?.message;
+                if (msg && msg !== 'List name is required' && msg !== 'List name must not exceed 255 characters') {
+                  return Promise.reject(<span role="alert">{msg}</span>);
+                }
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <Space.Compact style={{ width: '100%' }}>
+          <Input
+            id="list-name-input"
+            aria-label="List name"
+            placeholder="New list name…"
+          />
+          <Button type="primary" htmlType="submit">
+            Add List
+          </Button>
+        </Space.Compact>
+      </Form.Item>
+    </Form>
   );
 }

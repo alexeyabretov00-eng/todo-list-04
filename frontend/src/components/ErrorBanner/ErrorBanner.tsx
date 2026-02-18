@@ -5,8 +5,7 @@
  */
 
 import React from 'react';
-
-import { BannerWrapper, ErrorMessage, RetryButton } from './ErrorBanner.styled';
+import { Alert, Button } from 'antd';
 
 interface ErrorBannerProps {
   message: string;
@@ -15,11 +14,15 @@ interface ErrorBannerProps {
 
 export function ErrorBanner({ message, onRetry }: ErrorBannerProps): React.ReactElement {
   return (
-    <BannerWrapper role="alert">
-      <ErrorMessage>{message}</ErrorMessage>
-      <RetryButton type="button" onClick={onRetry}>
-        Retry
-      </RetryButton>
-    </BannerWrapper>
+    <Alert
+      type="error"
+      description={message}
+      role="alert"
+      action={
+        <Button size="small" danger onClick={onRetry}>
+          Retry
+        </Button>
+      }
+    />
   );
 }

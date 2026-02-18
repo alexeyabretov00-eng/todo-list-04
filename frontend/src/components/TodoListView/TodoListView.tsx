@@ -5,17 +5,10 @@
  */
 
 import React from 'react';
+import { EmptyState, SubItemForm, TodoItemForm } from '@components';
+import { Card, Layout, List, Typography } from 'antd';
 
-import { EmptyState } from '../EmptyState';
-import { SubItemForm } from '../SubItemForm';
-import { TodoItemForm } from '../TodoItemForm';
-
-import {
-  TodoItemContainer,
-  TodoTitle,
-  ViewTitle,
-  ViewWrapper,
-} from './TodoListView.styled';
+const { Title, Text } = Typography;
 
 interface TodoListViewProps {
   listName: string;
@@ -35,8 +28,8 @@ export function TodoListView({
   existingTodoTitles,
 }: TodoListViewProps): React.ReactElement {
   return (
-    <ViewWrapper>
-      <ViewTitle>{listName}</ViewTitle>
+    <Layout.Content style={{ padding: '16px 24px', overflowY: 'auto' }}>
+      <Title level={3} style={{ marginBottom: 16 }}>{listName}</Title>
 
       {todos.length === 0 ? (
         <EmptyState
@@ -47,38 +40,46 @@ export function TodoListView({
           }}
         />
       ) : (
-        todos.map((todo) => {
-          const subItems = subItemsByTodoId[todo.id] ?? [];
-          const existingSubTitles = subItems.map((s) => s.title);
+        <List
+          dataSource={todos}
+          renderItem={(todo) => {
+            const subItems = subItemsByTodoId[todo.id] ?? [];
+            const existingSubTitles = subItems.map((s) => s.title);
 
-          return (
-            <TodoItemContainer key={todo.id}>
-              <TodoTitle $completed={todo.completed}>{todo.title}</TodoTitle>
+            return (
+              <List.Item style={{ display: 'block', padding: 0, marginBottom: 8 }}>
+                <Card size="small" bodyStyle={{ padding: '12px' }}>
+                  <Text delete={todo.completed} style={{ fontSize: 14 }}>
+                    {todo.title}
+                  </Text>
 
-              {/* Sub-items list */}
-              {subItems.length > 0 && (
-                <ul style={{ listStyle: 'none', padding: '4px 0 4px 16px', margin: 0 }}>
-                  {subItems.map((sub) => (
-                    <li key={sub.id}>
-                      <TodoTitle $completed={sub.completed} style={{ fontSize: '13px' }}>
-                        {sub.title}
-                      </TodoTitle>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                  {subItems.length > 0 && (
+                    <List
+                      size="small"
+                      dataSource={subItems}
+                      renderItem={(sub) => (
+                        <List.Item style={{ padding: '2px 0 2px 16px' }}>
+                          <Text delete={sub.completed} style={{ fontSize: 13 }}>
+                            {sub.title}
+                          </Text>
+                        </List.Item>
+                      )}
+                      style={{ marginTop: 4 }}
+                    />
+                  )}
 
-              {/* Add sub-item */}
-              <SubItemForm
-                onSubmit={(title) => onAddSubItem(todo.id, title)}
-                existingTitles={existingSubTitles}
-              />
-            </TodoItemContainer>
-          );
-        })
+                  <SubItemForm
+                    onSubmit={(title) => onAddSubItem(todo.id, title)}
+                    existingTitles={existingSubTitles}
+                  />
+                </Card>
+              </List.Item>
+            );
+          }}
+        />
       )}
 
       <TodoItemForm onSubmit={onAddTodo} existingTitles={existingTodoTitles} />
-    </ViewWrapper>
+    </Layout.Content>
   );
 }

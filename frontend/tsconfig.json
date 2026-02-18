@@ -26,7 +26,9 @@
       "@assets": ["src/assets"],
       "@services": ["src/services"],
       "@slices": ["src/slices"],
-      "@store": ["src/store"]
+      "@store": ["src/store"],
+      "@selectors": ["src/selectors"],
+      "@containers": ["src/containers"]
     }
   },
   "include": ["src/**/*"],

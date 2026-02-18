@@ -4,8 +4,7 @@
  */
 
 import React from 'react';
-
-import { CtaButton, EmptyMessage, EmptyStateWrapper } from './EmptyState.styled';
+import { Button, Empty } from 'antd';
 
 interface EmptyStateProps {
   message: string;
@@ -15,11 +14,10 @@ interface EmptyStateProps {
 
 export function EmptyState({ message, ctaLabel, onCta }: EmptyStateProps): React.ReactElement {
   return (
-    <EmptyStateWrapper>
-      <EmptyMessage>{message}</EmptyMessage>
-      <CtaButton type="button" onClick={onCta}>
+    <Empty description={message}>
+      <Button type="primary" onClick={onCta}>
         {ctaLabel}
-      </CtaButton>
-    </EmptyStateWrapper>
+      </Button>
+    </Empty>
   );
 }

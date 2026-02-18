@@ -4,11 +4,8 @@
  */
 
 import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, Form, Input, Space } from 'antd';
 import { z } from 'zod';
-
-import { ErrorText, FormWrapper, InputRow, StyledInput, SubmitButton } from './SubItemForm.styled';
 
 interface SubItemFormProps {
   onSubmit: (title: string) => void;
@@ -27,40 +24,46 @@ const buildSchema = (existingTitles: string[]) =>
       ),
   });
 
-type FormValues = { title: string };
-
 export function SubItemForm({ onSubmit, existingTitles }: SubItemFormProps): React.ReactElement {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(buildSchema(existingTitles)),
-  });
+  const [form] = Form.useForm<{ title: string }>();
 
-  const handleValid = (data: FormValues) => {
-    onSubmit(data.title);
-    reset();
+  const handleFinish = (values: { title: string }) => {
+    onSubmit(values.title);
+    form.resetFields();
   };
 
   return (
-    <FormWrapper onSubmit={handleSubmit(handleValid)} noValidate>
-      <InputRow>
-        <label htmlFor="subitem-title-input" className="sr-only">
-          Subitem title
-        </label>
-        <StyledInput
-          id="subitem-title-input"
-          aria-label="Subitem title"
-          placeholder="New subitem title…"
-          {...register('title')}
-        />
-        <SubmitButton type="submit">Add Subitem</SubmitButton>
-      </InputRow>
-      {errors.title && (
-        <ErrorText role="alert">{errors.title.message}</ErrorText>
-      )}
-    </FormWrapper>
+    <Form form={form} onFinish={handleFinish} layout="vertical" style={{ padding: '4px 0' }}>
+      <Form.Item
+        name="title"
+        rules={[
+          { required: true, message: <span role="alert">Subitem title is required</span> },
+          { max: 255, message: <span role="alert">Subitem title must not exceed 255 characters</span> },
+          {
+            validator: (_, value: string) => {
+              const result = buildSchema(existingTitles).safeParse({ title: value ?? '' });
+              if (!result.success) {
+                const msg = result.error.issues[0]?.message;
+                if (msg && msg !== 'Subitem title is required' && msg !== 'Subitem title must not exceed 255 characters') {
+                  return Promise.reject(<span role="alert">{msg}</span>);
+                }
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <Space.Compact style={{ width: '100%' }}>
+          <Input
+            id="subitem-title-input"
+            aria-label="Subitem title"
+            placeholder="New subitem title…"
+          />
+          <Button type="primary" htmlType="submit" size="small">
+            Add Subitem
+          </Button>
+        </Space.Compact>
+      </Form.Item>
+    </Form>
   );
 }

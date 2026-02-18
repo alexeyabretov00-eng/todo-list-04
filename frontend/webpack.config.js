@@ -1,19 +1,21 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
-import { default as createStyledComponentsTransformer } from 'typescript-plugin-styled-components';
+import { createTransformer } from 'typescript-plugin-styled-components';
+import webpack from 'webpack';
 
-const styledComponentsTransformer = createStyledComponentsTransformer({
+const styledComponentsTransformer = createTransformer({
   ssr: false,
   displayName: true,
 });
 
-module.exports = (env, argv) => {
+export default (env, argv) => {
   const isProduction = argv && argv.mode === 'production';
+  const root = process.cwd();
 
   return {
     entry: './src/index.tsx',
     output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(root, 'dist'),
       filename: isProduction ? '[name].[contenthash].js' : '[name].js',
       publicPath: '/',
       clean: true,
@@ -21,15 +23,17 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
       alias: {
-        '@components': path.resolve(__dirname, 'src/components'),
-        '@hooks': path.resolve(__dirname, 'src/hooks'),
-        '@utils': path.resolve(__dirname, 'src/utils'),
-        '@api': path.resolve(__dirname, 'src/api'),
-        '@styles': path.resolve(__dirname, 'src/styles'),
-        '@assets': path.resolve(__dirname, 'src/assets'),
-        '@services': path.resolve(__dirname, 'src/services'),
-        '@slices': path.resolve(__dirname, 'src/slices'),
-        '@store': path.resolve(__dirname, 'src/store'),
+        '@components': path.resolve(root, 'src/components'),
+        '@hooks': path.resolve(root, 'src/hooks'),
+        '@utils': path.resolve(root, 'src/utils'),
+        '@api': path.resolve(root, 'src/api'),
+        '@styles': path.resolve(root, 'src/styles'),
+        '@assets': path.resolve(root, 'src/assets'),
+        '@services': path.resolve(root, 'src/services'),
+        '@slices': path.resolve(root, 'src/slices'),
+        '@store': path.resolve(root, 'src/store'),
+        '@selectors': path.resolve(root, 'src/selectors'),
+        '@containers': path.resolve(root, 'src/containers'),
       },
     },
     module: {
@@ -53,13 +57,17 @@ module.exports = (env, argv) => {
     plugins: [
       new HtmlWebpackPlugin({
         template: './public/index.html',
-        favicon: './public/favicon.ico',
+      }),
+      new webpack.DefinePlugin({
+        'process.env.API_PATH': JSON.stringify(process.env.API_PATH ?? '/api'),
+        'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
       }),
     ],
     devServer: {
       port: 3000,
       historyApiFallback: true,
       hot: true,
+      open: true,
       proxy: [
         {
           context: ['/api'],
