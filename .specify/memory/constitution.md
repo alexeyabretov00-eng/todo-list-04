@@ -38,7 +38,7 @@ React components MUST be "stupid" (presentational), with containers handling dat
 - **API Client**: fetch API (no CORS, same domain, dev proxy configured)
 - **Testing**: Jest (≥80% coverage), Storybook for component documentation
 - **Linting/Formatting**: ESLint, Prettier, eslint-plugin-simple-import-sort, commitlint
-- **NPM packages versions**: All npm packages MUST HAVE latest versions
+- **Packages**: NPM, All npm packages MUST HAVE latest versions, Do not use prefixes in package's versions
 - **Module Resolution**: Path aliases configured in tsconfig.json and bundler:
   - `@components` → `./src/components`
   - `@hooks` → `./src/hooks`
