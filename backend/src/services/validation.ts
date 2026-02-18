@@ -7,8 +7,8 @@ import { z } from 'zod';
  * Uniqueness enforced at DB layer (UNIQUE index on todo_lists.name) — T082 is authoritative.
  */
 export const todoListNameSchema = z
-  .string({ required_error: 'name is required' })
-  .min(1, 'name must not be empty')
+  .string()
+  .min(1, 'name is required')
   .max(255, 'name must not exceed 255 characters');
 
 export const createTodoListSchema = z.object({
@@ -27,8 +27,8 @@ export const updateTodoListSchema = z.object({
  * Uniqueness enforced at DB layer (UNIQUE index on (list_id, title)) — T082 is authoritative.
  */
 export const todoItemTitleSchema = z
-  .string({ required_error: 'title is required' })
-  .min(1, 'title must not be empty')
+  .string()
+  .min(1, 'title is required')
   .max(255, 'title must not exceed 255 characters');
 
 export const createTodoItemSchema = z.object({
@@ -48,8 +48,8 @@ export const updateTodoItemSchema = z.object({
  * Uniqueness enforced at DB layer (UNIQUE index on (todo_id, title)) — T082 is authoritative.
  */
 export const subItemTitleSchema = z
-  .string({ required_error: 'title is required' })
-  .min(1, 'title must not be empty')
+  .string()
+  .min(1, 'title is required')
   .max(255, 'title must not exceed 255 characters');
 
 export const createSubItemSchema = z.object({
@@ -65,7 +65,7 @@ export const updateSubItemSchema = z.object({
 // ─── Reorder ──────────────────────────────────────────────────────────────────
 
 export const reorderSchema = z.object({
-  orderedIds: z.array(z.string()).min(1, 'orderedIds must not be empty'),
+  orderedIds: z.array(z.string()).min(1),
 });
 
 // ─── Sync ─────────────────────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ export const syncOperationSchema = z.object({
   entityType: z.enum(['list', 'todo', 'subitem']),
   operation: z.enum(['create', 'update', 'delete', 'reorder']),
   entityId: z.string(),
-  payload: z.record(z.unknown()),
+  payload: z.record(z.string(), z.unknown()),
   clientTimestamp: z.string().datetime(),
   idempotencyKey: z.string(),
 });

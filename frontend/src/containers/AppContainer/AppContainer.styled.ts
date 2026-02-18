@@ -2,9 +2,7 @@ import styled, { keyframes } from 'styled-components';
 
 export const AppWrapper = styled.div`
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
-  padding: 16px;
   box-sizing: border-box;
 `;
 
@@ -22,5 +20,14 @@ export const LoadingIndicator = styled.span`
   border-radius: 50%;
   animation: ${spin} 0.7s linear infinite;
   align-self: center;
-  margin-top: 20vh;
+  margin: 20vh auto;
+`;
+
+export const FullPageCenter = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
 `;

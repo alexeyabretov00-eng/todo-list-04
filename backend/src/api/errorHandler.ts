@@ -14,8 +14,19 @@ export interface ApiError {
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   // Zod validation errors → 422
   if (err instanceof ZodError) {
-    const message = err.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+    const message = err.issues.map((e) => `${(e.path as unknown[]).join('.')}: ${e.message}`).join(', ');
     res.status(422).json({ code: 'VALIDATION_ERROR', message } satisfies ApiError);
+    return;
+  }
+
+  // SQLite UNIQUE constraint violation → 409 Conflict
+  if (
+    err &&
+    typeof err === 'object' &&
+    'code' in err &&
+    (err as { code: string }).code === 'SQLITE_CONSTRAINT_UNIQUE'
+  ) {
+    res.status(409).json({ code: 'CONFLICT', message: 'A record with that value already exists' } satisfies ApiError);
     return;
   }
 

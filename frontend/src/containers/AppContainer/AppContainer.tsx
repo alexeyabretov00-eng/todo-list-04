@@ -1,53 +1,75 @@
 import React, { useEffect } from 'react';
-import { fetchLists } from '@slices';
+import { createList, fetchLists, selectList } from '@slices';
 import { useAppDispatch, useAppSelector } from '@store';
 
 import { getAppContainerProps } from '../../selectors/containers';
+import { ErrorBanner } from '../../components/ErrorBanner';
+import { ListPanel } from '../../components/ListPanel';
+import { TodoListsViewContainer } from '../TodoListsViewContainer';
 
-import { AppWrapper, LoadingIndicator } from './AppContainer.styled';
+import {
+  AppWrapper,
+  FullPageCenter,
+  LoadingIndicator,
+} from './AppContainer.styled';
 
 export function AppContainer(): React.ReactElement {
   const dispatch = useAppDispatch();
-  const { lists, loading, error } = useAppSelector(getAppContainerProps);
+  const { lists, selectedListId, loading, error } =
+    useAppSelector(getAppContainerProps);
 
   useEffect(() => {
     void dispatch(fetchLists());
   }, [dispatch]);
 
+  const handleSelectList = (id: string) => {
+    dispatch(selectList(id));
+  };
+
+  const handleCreateList = (name: string) => {
+    void dispatch(createList(name));
+  };
+
   if (loading) {
     return (
-      <AppWrapper>
+      <FullPageCenter>
         <LoadingIndicator role="status" aria-label="Loading lists…" />
-      </AppWrapper>
+      </FullPageCenter>
     );
   }
 
   if (error) {
     return (
-      <AppWrapper>
-        <p role="alert">{error}</p>
-        <button onClick={() => void dispatch(fetchLists())}>Retry</button>
-      </AppWrapper>
+      <FullPageCenter>
+        <ErrorBanner
+          message={error}
+          onRetry={() => void dispatch(fetchLists())}
+        />
+      </FullPageCenter>
     );
   }
 
-  if (lists.length === 0) {
-    return (
-      <AppWrapper>
-        <p>No lists yet. Get started by creating one.</p>
-        {/* CTA — accessible button with name matching the test query /add.*list|create.*list/i */}
-        <button aria-label="Add List">Add List</button>
-      </AppWrapper>
-    );
-  }
+  const selectedList = lists.find((l) => l.id === selectedListId) ?? null;
 
   return (
     <AppWrapper>
-      <ul>
-        {lists.map((list) => (
-          <li key={list.id}>{list.name}</li>
-        ))}
-      </ul>
+      <ListPanel
+        lists={lists}
+        selectedListId={selectedListId}
+        onSelectList={handleSelectList}
+        onCreateList={handleCreateList}
+      />
+      {selectedList ? (
+        <TodoListsViewContainer listName={selectedList.name} />
+      ) : (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: '#8c8c8c' }}>
+            {lists.length === 0
+              ? 'Create a list to get started.'
+              : 'Select a list to view tasks.'}
+          </p>
+        </div>
+      )}
     </AppWrapper>
   );
 }

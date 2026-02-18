@@ -12,12 +12,14 @@
     "check:versions": "node -e \"const p=require('./package.json'); const bad=[...Object.values(p.dependencies||{}),...Object.values(p.devDependencies||{})].filter(v=>v.startsWith('^')||v.startsWith('~')); if(bad.length){console.error('Version prefix found:',bad);process.exit(1);}console.log('All versions pinned exactly.');\""
   },
   "dependencies": {
+    "@types/supertest": "6.0.3",
     "better-sqlite3": "12.6.2",
     "body-parser": "2.2.2",
     "cors": "2.8.6",
     "dotenv": "17.3.1",
     "express": "5.2.1",
     "morgan": "1.10.1",
+    "supertest": "7.2.2",
     "uuid": "11.0.0",
     "zod": "4.3.6"
   },

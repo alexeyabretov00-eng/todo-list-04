@@ -79,6 +79,7 @@ describe('AppContainer — startup data-load sequence (FR-011, FR-020)', () => {
   it('(d) shows add-list CTA when API returns empty array (FR-020)', () => {
     const store = makeStore({ items: [], loading: false, error: null });
     render(<Provider store={store}><AppContainer /></Provider>);
-    expect(screen.getByRole('button', { name: /add.*list|create.*list/i })).toBeInTheDocument();
+    const addListButtons = screen.getAllByRole('button', { name: /add.*list|create.*list/i });
+    expect(addListButtons.length).toBeGreaterThanOrEqual(1);
   });
 });

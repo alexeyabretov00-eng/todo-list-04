@@ -14,7 +14,7 @@ router.post('/operations', (req, res, next) => {
     if (!parsed.success) {
       res.status(422).json({
         code: 'VALIDATION_ERROR',
-        message: parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', '),
+        message: parsed.error.issues.map((e) => `${(e.path as unknown[]).join('.')}: ${e.message}`).join(', '),
       });
       return;
     }
