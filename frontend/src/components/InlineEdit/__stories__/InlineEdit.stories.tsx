@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
 
 import { InlineEdit } from '../InlineEdit';
 
@@ -8,8 +7,8 @@ const meta: Meta<typeof InlineEdit> = {
   component: InlineEdit,
   args: {
     value: 'Buy groceries',
-    onRename: fn(),
-    onDelete: fn(),
+    onRename: () => {},
+    onDelete: () => {},
   },
 };
 

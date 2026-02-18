@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
 
 import { ReorderList } from '../ReorderList';
 
@@ -7,7 +6,7 @@ const meta: Meta<typeof ReorderList> = {
   title: 'Components/ReorderList',
   component: ReorderList,
   args: {
-    onReorder: fn(),
+    onReorder: () => {},
   },
 };
 
