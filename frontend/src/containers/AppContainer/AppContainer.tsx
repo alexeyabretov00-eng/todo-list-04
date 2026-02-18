@@ -14,6 +14,7 @@ import React, { useCallback, useEffect } from 'react';
 import { ErrorBanner, ListPanel, SyncStatus } from '@components';
 import { TodoListsViewContainer } from '@containers';
 import { getAppContainerProps } from '@selectors';
+import { flushQueue, getPendingOperations } from '@services';
 import {
   clearFailedIds,
   createList,
@@ -27,7 +28,6 @@ import {
   setSyncError,
   setSyncing,
 } from '@slices';
-import { flushQueue, getPendingOperations } from '@services';
 import { useAppDispatch, useAppSelector } from '@store';
 import { Layout, Spin, Typography } from 'antd';
 
