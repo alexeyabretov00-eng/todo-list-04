@@ -85,8 +85,8 @@ As a user, I want to rename or remove lists, todos, and subitems so I can keep m
 ### Functional Requirements
 
 - **FR-001**: Users MUST be able to create, rename, and delete todo lists.
-- **FR-002**: Users MUST be able to add, edit, and delete todo items within a list.
-- **FR-003**: Users MUST be able to add, edit, and delete subitems under a todo item.
+- **FR-002**: Users MUST be able to add, rename (title only), and delete todo items within a list.
+- **FR-003**: Users MUST be able to add, rename (title only), and delete subitems under a todo item.
 - **FR-004**: Users MUST be able to mark todos and subitems as complete or incomplete.
 - **FR-005**: When a todo is marked complete, all its subitems MUST be marked complete.
 - **FR-022**: When a todo is marked incomplete, its subitems MUST retain their individual completion state unchanged.
@@ -94,16 +94,16 @@ As a user, I want to rename or remove lists, todos, and subitems so I can keep m
 - **FR-007**: The app MUST work without user accounts or sign-in.
 - **FR-008**: The app MUST be usable on both desktop and mobile screens.
 - **FR-009**: The app MUST allow users to view and edit existing lists after closing and reopening the app.
-- **FR-010**: When offline, users MUST be able to make changes that are queued and applied once the backend API endpoint becomes reachable again.
+- **FR-010**: When offline, users MUST be able to make changes that are queued (persisted to IndexedDB) and applied once the backend API endpoint becomes reachable again. Successfully synced operations MUST be removed from the queue. If a sync attempt fails, the operation MUST be retried (up to 3 times with exponential backoff); after 3 failed attempts, the app MUST surface an error to the user.
 - **FR-011**: On startup, the app MUST load the latest lists, todos, and subitems from the data service.
 - **FR-012**: Users MUST be able to reorder lists, todos, and subitems manually.
-- **FR-013**: When syncing offline changes, the most recent change MUST win if a conflict is detected.
+- **FR-013**: When syncing offline changes, the most recent change MUST win if a conflict is detected (compared by `updatedAt` timestamp). When two conflicting operations have equal `updatedAt` values, the server-received operation MUST be preferred.
 - **FR-014**: List names MUST be unique within the app.
 - **FR-015**: Todo titles MUST be unique within their list.
 - **FR-016**: Subitem titles MUST be unique within their parent todo.
 - **FR-017**: When all subitems are complete, the parent todo MUST be marked complete automatically.
 - **FR-018**: Deleting lists, todos, or subitems MUST remove them immediately with no undo and without requiring a confirmation dialog.
-- **FR-019**: Titles for lists, todos, and subitems MUST NOT exceed 255 characters; input exceeding this limit MUST be rejected with an inline validation error.
+- **FR-019**: Titles for lists, todos, and subitems MUST NOT exceed 255 characters. This limit MUST be enforced at two layers: (1) frontend — Zod schema via react-hook-form rejects input exceeding 255 characters with an inline validation error before submission; (2) backend — API returns HTTP 400 with a validation error message if a title exceeding 255 characters is received.
 - **FR-020**: When a list contains no todos, the app MUST display a placeholder message and a visible add-todo button. When the app contains no lists, the app MUST display a placeholder message and a visible add-list button.
 - **FR-021**: When the app fails to load data on startup (e.g. API unreachable), it MUST display an error message and a retry button; stale or empty data MUST NOT be silently presented.
 
@@ -116,7 +116,7 @@ As a user, I want to rename or remove lists, todos, and subitems so I can keep m
 ### Assumptions
 
 - The app is single-user with no collaboration or sharing.
-- Todos support a single level of subitems (no deeper nesting).
+- Todos support a single level of subitems (no deeper nesting). The API MUST reject any request to create a SubItem whose parent is another SubItem, returning HTTP 400.
 - Titles are required for lists, todos, and subitems.
 - The data service is the local REST API backed by SQLite, served from the same origin; it is the single source of truth for all application data.
 

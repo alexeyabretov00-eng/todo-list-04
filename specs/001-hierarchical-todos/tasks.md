@@ -43,16 +43,18 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T015 [P] Implement backend error handling middleware in backend/src/api/errorHandler.ts
 - [ ] T016 [P] Configure SQLite connection in backend/src/services/db.ts
 - [ ] T017 [P] Define data models in backend/src/models/todoList.ts, backend/src/models/todoItem.ts, backend/src/models/subItem.ts
-- [ ] T018 [P] Define offline queue model in backend/src/models/offlineOperation.ts
-- [ ] T019 Create validation schemas **and** DB-level uniqueness constraints in backend/src/services/validation.ts — covers list name unique across app, todo title unique within list, subitem title unique within todo; Zod schemas (`z.string().max(255)`) plus SQLite UNIQUE index definitions; includes DB-layer uniqueness constraints mirrored in T082 migrations (list.name, todo title+listId, subitem title+todoId)
-- [ ] T082 Create database schema and migrations in backend/src/services/migrations/ — must include UNIQUE constraints from T019 design (list.name, todo title+listId, subitem title+todoId)
+- [ ] T018 [P] Define offline queue model in backend/src/models/offlineOperation.ts — model MUST enumerate all operation types: `create`, `update` (rename), `delete`, and `reorder`; include `entityType` (`list` | `todo` | `subitem`), `entityId`, `payload`, `updatedAt`, and `retryCount` fields
+- [ ] T019 Create Zod validation schemas in backend/src/services/validation.ts — covers list name unique across app, todo title unique within list, subitem title unique within todo; Zod schemas only (`z.string().max(255)` etc.); does NOT own DDL — DB-layer uniqueness is owned exclusively by T082
+- [ ] T082 Create database schema and migrations in backend/src/services/migrations/ — **sole owner of all DDL**; MUST include UNIQUE constraints (list.name, todo title+listId, subitem title+todoId) as SQLite UNIQUE index definitions; T019 Zod schemas must mirror these constraints but T082 is the authoritative source
 - [ ] T020 [P] Create shared frontend types in frontend/src/types/todos.ts
 - [ ] T021 [P] Create Redux store in frontend/src/store/store.ts
 - [ ] T022 [P] Create RTK Query base API in frontend/src/api/baseApi.ts
 - [ ] T023 [P] Create offline queue service in frontend/src/services/offlineQueue.ts
+- [ ] T089 [P] Unit tests for offline queue service in frontend/src/services/__tests__/offlineQueue.test.ts — MUST be completed before T023 is considered done (TDD gate); validates FR-010: (a) pending operation is written to IndexedDB when offline, (b) queue is read and dispatched on reconnect, (c) successfully synced operations are removed from the queue
 - [ ] T072 [P] Add offline sync endpoint implementation in backend/src/api/sync.ts
 - [ ] T073 [P] Add offline sync service implementation in backend/src/services/syncService.ts — MUST implement last-write-wins by comparing timestamps on conflicting operations (see T086 for test coverage)
 - [ ] T086 [P] Unit tests for last-write-wins conflict resolution in backend/tests/unit/syncConflict.test.ts — validates FR-013: when two operations modify the same item, the one with the most recent `updatedAt` timestamp wins after sync; MUST be completed before T073 is considered done (TDD gate)
+- [ ] T090 [P] Unit/integration test for AppContainer startup data-load sequence in frontend/src/containers/AppContainer/__tests__/AppContainer.test.tsx — validates FR-011: (a) `GET /api/lists` is called on component mount, (b) returned list data is rendered, (c) loading state is shown while request is in-flight; complements T088 which covers the error path only; also MUST assert (d) when API returns an empty array, the add-list CTA (button/placeholder) is visible — covers the no-lists half of FR-020
 - [ ] T074 [P] Wire offline sync to RTK Query in frontend/src/api/todoApi.ts — **creates the file shell** (baseApi injection, sync mutation); T039/T040/T041 extend this file in that order
 - [ ] T024 [P] Create selectors in frontend/src/selectors/containers.ts
 - [ ] T025 [P] Create root AppContainer in frontend/src/containers/AppContainer/AppContainer.tsx and frontend/src/containers/AppContainer/AppContainer.styled.ts
@@ -77,9 +79,9 @@ description: "Task list for hierarchical todo app implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T033 [P] [US1] Implement list service in backend/src/services/listService.ts
-- [ ] T034 [P] [US1] Implement todo service in backend/src/services/todoService.ts
-- [ ] T035 [P] [US1] Implement subitem service in backend/src/services/subItemService.ts
+- [ ] T033 [P] [US1] Implement list service (Create + Read only) in backend/src/services/listService.ts — rename/delete operations are added by T063
+- [ ] T034 [P] [US1] Implement todo service (Create + Read only) in backend/src/services/todoService.ts — rename/delete operations are added by T063
+- [ ] T035 [P] [US1] Implement subitem service (Create + Read only) in backend/src/services/subItemService.ts — rename/delete operations are added by T063
 - [ ] T036 [P] [US1] Implement list routes in backend/src/api/lists.ts
 - [ ] T037 [P] [US1] Implement todo routes in backend/src/api/todos.ts
 - [ ] T038 [P] [US1] Implement subitem routes in backend/src/api/subitems.ts
@@ -109,14 +111,14 @@ description: "Task list for hierarchical todo app implementation"
 ### Tests for User Story 2
 
 - [ ] T049 [P] [US2] Contract tests for completion updates in backend/tests/contract/completion.test.ts
-- [ ] T050 [P] [US2] Service tests for completion rules in backend/tests/unit/completionRules.test.ts
+- [ ] T050 [P] [US2] Service tests for completion rules in backend/tests/unit/completionRules.test.ts — MUST explicitly cover all four rules: FR-005 (marking todo complete cascades to subitems), FR-006 (any subitem incomplete marks parent incomplete), FR-017 (all subitems complete auto-completes parent), FR-022 (marking todo incomplete does NOT cascade to subitems — each subitem retains its current state)
 - [ ] T051 [P] [US2] Component tests for completion toggle in frontend/src/components/TodoItemRow/__tests__/TodoItemRow.test.tsx
 
 ### Implementation for User Story 2
 
 - [ ] T052 [US2] Implement completion rules in backend/src/services/completionRules.ts
-- [ ] T053 [US2] Update todo/subitem services for completion logic in backend/src/services/todoService.ts and backend/src/services/subItemService.ts
-- [ ] T054 [US2] Expose completion updates in backend/src/api/todos.ts and backend/src/api/subitems.ts
+- [ ] T053 [US2] Update todo/subitem services for completion logic in backend/src/services/todoService.ts and backend/src/services/subItemService.ts — **requires T041** (subitem RTK Query endpoints must exist before completion logic can be wired end-to-end)
+- [ ] T054 [US2] Expose completion updates in backend/src/api/todos.ts and backend/src/api/subitems.ts — **requires T041**
 - [ ] T055 [US2] Add completion mutations to frontend RTK Query in frontend/src/api/todoApi.ts
 - [ ] T056 [P] [US2] Create TodoItemRow component in frontend/src/components/TodoItemRow/TodoItemRow.tsx and frontend/src/components/TodoItemRow/TodoItemRow.styled.ts
 - [ ] T057 [P] [US2] Create SubItemRow component in frontend/src/components/SubItemRow/SubItemRow.tsx and frontend/src/components/SubItemRow/SubItemRow.styled.ts
@@ -135,9 +137,9 @@ description: "Task list for hierarchical todo app implementation"
 
 ### Tests for User Story 3
 
-- [ ] T060 [P] [US3] Contract tests for rename/delete in backend/tests/contract/editing.test.ts
+- [ ] T060 [P] [US3] Contract tests for rename/delete in backend/tests/contract/editing.test.ts — MUST include assertion that `DELETE` completes without a confirmation step (i.e., a single request returns 200/204 with no intermediate confirm endpoint); mirrors FR-018
 - [ ] T061 [P] [US3] Contract tests for reorder in backend/tests/contract/reorder.test.ts
-- [ ] T062 [P] [US3] Component tests for edit/delete in frontend/src/components/InlineEdit/__tests__/InlineEdit.test.tsx
+- [ ] T062 [P] [US3] Component tests for edit/delete in frontend/src/components/InlineEdit/__tests__/InlineEdit.test.tsx — MUST assert that clicking delete does not render a confirmation modal/popover before the delete action fires; mirrors FR-018
 
 ### Implementation for User Story 3
 
@@ -147,7 +149,7 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T066 [US3] Add reorder routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
 - [ ] T067 [US3] Add edit/reorder mutations in frontend/src/api/todoApi.ts
 - [ ] T068 [P] [US3] Create InlineEdit component in frontend/src/components/InlineEdit/InlineEdit.tsx and frontend/src/components/InlineEdit/InlineEdit.styled.ts
-- [ ] T069 [P] [US3] Create ReorderList component in frontend/src/components/ReorderList/ReorderList.tsx and frontend/src/components/ReorderList/ReorderList.styled.ts
+- [ ] T069 [P] [US3] Create ReorderList component in frontend/src/components/ReorderList/ReorderList.tsx and frontend/src/components/ReorderList/ReorderList.styled.ts — **custom component justified**: Ant Design's drag-sort is a Table variant unsuitable for plain ordered lists; a lightweight custom drag-and-drop list is required per constitution §V
 - [ ] T070 [US3] Wire edit/delete/reorder in frontend/src/containers/AppContainer/AppContainer.tsx
 - [ ] T071 [P] [US3] Add Storybook stories for editing components in frontend/src/components/InlineEdit/__stories__/InlineEdit.stories.tsx
 
@@ -160,8 +162,9 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T075 [P] Add offline sync UI indicators in frontend/src/components/SyncStatus/SyncStatus.tsx and frontend/src/components/SyncStatus/SyncStatus.styled.ts
 - [ ] T076 Add sync status wiring in frontend/src/containers/AppContainer/AppContainer.tsx
 - [ ] T077 [P] Add Storybook story for sync status in frontend/src/components/SyncStatus/__stories__/SyncStatus.stories.tsx
-- [ ] T078 Run quickstart validation steps in specs/001-hierarchical-todos/quickstart.md
-- [ ] T084 Validate responsive layout on mobile and desktop viewports in frontend (manual checklist)
+- [ ] T078 Run quickstart validation steps in specs/001-hierarchical-todos/quickstart.md — done when all steps pass without errors in a fresh environment with no pre-existing database or cache
+- [ ] T084 Validate responsive layout on mobile and desktop viewports — manual checklist covering: (a) 375px (mobile portrait), (b) 768px (tablet), (c) 1280px (desktop); verify touch interaction targets and no horizontal overflow at each breakpoint; pass/fail documented in checklist
+- [ ] T091 [P] Automated viewport regression tests in frontend — add Jest + jsdom tests for key components (ListPanel, TodoItemRow, SubItemRow) that assert layout does not break at 375px viewport width; covers FR-008 and constitution §II automated test gate
 
 ---
 
@@ -180,6 +183,8 @@ description: "Task list for hierarchical todo app implementation"
 - **US2 (P2)**: Depends on Foundational and US1 APIs for todos/subitems.
 - **US3 (P3)**: Depends on Foundational and US1 entities; can be parallelized after US1 models/services.
 - **T086**: Must complete before T073 is considered done (TDD gate — syncService has no tests otherwise until Phase 4).
+- **T089**: Must complete before T023 is considered done (TDD gate — offlineQueue service has no tests otherwise).
+- **T041**: Must complete before T053 and T054 can be wired end-to-end (subitem RTK Query endpoints are required for completion logic; cross-phase dependency Phase 3 → Phase 4).
 
 ### Parallel Execution Examples
 

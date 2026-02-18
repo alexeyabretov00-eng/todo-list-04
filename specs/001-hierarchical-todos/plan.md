@@ -17,7 +17,7 @@ Deliver a single-user hierarchical todo app that supports lists, todos, and subi
 **Testing**: Jest (≥80% coverage), Storybook stories co-located with components
 **Target Platform**: Web (desktop + mobile), PWA-enabled
 **Project Type**: web (frontend + backend)
-**Performance Goals**: Smooth interactions for lists up to 200 todos and 500 subitems; offline sync within 30 seconds after reconnect
+**Performance Goals**: UI interactions (toggle completion, rename, delete) MUST respond within 150ms at up to 200 todos and 500 subitems (no perceived lag); offline sync completes within 30 seconds after reconnect; see SC-004 for data-integrity gate at that scale
 **Constraints**: Offline-capable with queued operations persisted to IndexedDB; API-driven state; no Redux persistence; titles max 255 chars
 **Scale/Scope**: Single-user app; one level of subitems; manual ordering of lists, todos, subitems
 
