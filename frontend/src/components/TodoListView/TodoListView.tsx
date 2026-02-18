@@ -1,14 +1,15 @@
 /**
- * T046 – TodoListView component
+ * T046/T058 – TodoListView component
  * Renders the todos for a selected list, with sub-items per todo.
  * Shows EmptyState (FR-020) when the list has no todos.
+ * T058: forwards completion toggle callbacks to TodoItemRow.
  */
 
 import React from 'react';
-import { EmptyState, SubItemForm, TodoItemForm } from '@components';
+import { EmptyState, SubItemForm, TodoItemForm, TodoItemRow } from '@components';
 import { Card, Layout, List, Typography } from 'antd';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 interface TodoListViewProps {
   listName: string;
@@ -16,6 +17,8 @@ interface TodoListViewProps {
   subItemsByTodoId: Record<string, SubItem[]>;
   onAddTodo: (title: string) => void;
   onAddSubItem: (todoId: string, title: string) => void;
+  onToggleTodo: (todoId: string, completed: boolean) => void;
+  onToggleSubItem: (subItemId: string, completed: boolean) => void;
   existingTodoTitles: string[];
 }
 
@@ -25,6 +28,8 @@ export function TodoListView({
   subItemsByTodoId,
   onAddTodo,
   onAddSubItem,
+  onToggleTodo,
+  onToggleSubItem,
   existingTodoTitles,
 }: TodoListViewProps): React.ReactElement {
   return (
@@ -49,24 +54,12 @@ export function TodoListView({
             return (
               <List.Item style={{ display: 'block', padding: 0, marginBottom: 8 }}>
                 <Card size="small" bodyStyle={{ padding: '12px' }}>
-                  <Text delete={todo.completed} style={{ fontSize: 14 }}>
-                    {todo.title}
-                  </Text>
-
-                  {subItems.length > 0 && (
-                    <List
-                      size="small"
-                      dataSource={subItems}
-                      renderItem={(sub) => (
-                        <List.Item style={{ padding: '2px 0 2px 16px' }}>
-                          <Text delete={sub.completed} style={{ fontSize: 13 }}>
-                            {sub.title}
-                          </Text>
-                        </List.Item>
-                      )}
-                      style={{ marginTop: 4 }}
-                    />
-                  )}
+                  <TodoItemRow
+                    todo={todo}
+                    subItems={subItems}
+                    onToggleTodo={onToggleTodo}
+                    onToggleSubItem={onToggleSubItem}
+                  />
 
                   <SubItemForm
                     onSubmit={(title) => onAddSubItem(todo.id, title)}

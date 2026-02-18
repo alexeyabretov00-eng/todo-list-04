@@ -1,6 +1,6 @@
 /**
- * T037 – Todo routes: Create + Read (Phase 3)
- * Completion (T054), rename/delete (T065), and reorder (T066) are added in later phases.
+ * T037/T054 – Todo routes: Create + Read (Phase 3); Completion (Phase 4)
+ * Rename/delete (T065) and reorder (T066) are added in later phases.
  *
  * Two mount points (both registered in api/index.ts):
  *   - Nested:    /api/lists/:listId/todos  (create + list)
@@ -17,6 +17,7 @@ import {
   deleteTodo,
   reorderTodos,
 } from '../services/todoService';
+import { completeTodo, incompleteTodo } from '../services/completionRules';
 
 // ─── Nested router: mounted at /api/lists/:listId/todos (mergeParams: true) ──
 
@@ -77,7 +78,16 @@ todosRouter.patch('/:todoId', (req: Request, res: Response, next: NextFunction) 
   const { todoId } = req.params as { todoId: string };
   try {
     const fields = updateTodoItemSchema.parse(req.body);
-    const updated = updateTodo(todoId, fields);
+    let updated;
+    if (fields.completed === true && fields.title === undefined && fields.position === undefined) {
+      // FR-005: cascade completion to all subitems
+      updated = completeTodo(todoId);
+    } else if (fields.completed === false && fields.title === undefined && fields.position === undefined) {
+      // FR-022: mark incomplete without cascading
+      updated = incompleteTodo(todoId);
+    } else {
+      updated = updateTodo(todoId, fields);
+    }
     if (!updated) {
       res.status(404).json({ code: 'NOT_FOUND', message: 'Todo not found' });
       return;

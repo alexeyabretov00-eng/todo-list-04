@@ -21,6 +21,8 @@ jest.mock('@slices', () => ({
   createTodo: jest.fn(() => ({ type: 'todos/create/pending' })),
   fetchSubItems: jest.fn((todoId: string) => ({ type: 'subitems/fetchForTodo/pending', meta: { arg: todoId } })),
   createSubItem: jest.fn(() => ({ type: 'subitems/create/pending' })),
+  toggleTodoComplete: jest.fn(() => ({ type: 'todos/toggleComplete/pending' })),
+  toggleSubItemComplete: jest.fn(() => ({ type: 'subitems/toggleComplete/pending' })),
 }));
 
 // ─── Store helpers ────────────────────────────────────────────────────────────

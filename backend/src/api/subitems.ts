@@ -1,6 +1,6 @@
 /**
- * T038 – Subitem routes: Create + Read (Phase 3)
- * Completion (T054), rename/delete (T065), and reorder (T066) are added in later phases.
+ * T038/T054 – Subitem routes: Create + Read (Phase 3); Completion (Phase 4)
+ * Rename/delete (T065) and reorder (T066) are added in later phases.
  *
  * Two mount points (both registered in api/index.ts):
  *   - Nested:    /api/todos/:todoId/subitems  (create + list)
@@ -17,6 +17,7 @@ import {
   deleteSubItem,
   reorderSubItems,
 } from '../services/subItemService';
+import { completeSubItem, incompleteSubItem } from '../services/completionRules';
 
 // ─── Nested router: mounted at /api/todos/:todoId/subitems (mergeParams: true) ─
 
@@ -77,7 +78,16 @@ subitemsRouter.patch('/:subItemId', (req: Request, res: Response, next: NextFunc
   const { subItemId } = req.params as { subItemId: string };
   try {
     const fields = updateSubItemSchema.parse(req.body);
-    const updated = updateSubItem(subItemId, fields);
+    let updated;
+    if (fields.completed === true && fields.title === undefined && fields.position === undefined) {
+      // FR-017: auto-complete parent when all subitems done
+      updated = completeSubItem(subItemId);
+    } else if (fields.completed === false && fields.title === undefined && fields.position === undefined) {
+      // FR-006: mark parent incomplete when any subitem is incomplete
+      updated = incompleteSubItem(subItemId);
+    } else {
+      updated = updateSubItem(subItemId, fields);
+    }
     if (!updated) {
       res.status(404).json({ code: 'NOT_FOUND', message: 'SubItem not found' });
       return;

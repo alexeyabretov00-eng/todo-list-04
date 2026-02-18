@@ -113,20 +113,20 @@ description: "Task list for hierarchical todo app implementation"
 
 ### Tests for User Story 2
 
-- [ ] T049 [P] [US2] Contract tests for completion updates in backend/tests/contract/completion.test.ts
-- [ ] T050 [P] [US2] Service tests for completion rules in backend/tests/unit/completionRules.test.ts — MUST explicitly cover all four rules: FR-005 (marking todo complete cascades to subitems), FR-006 (any subitem incomplete marks parent incomplete), FR-017 (all subitems complete auto-completes parent), FR-022 (marking todo incomplete does NOT cascade to subitems — each subitem retains its current state)
-- [ ] T051 [P] [US2] Component tests for completion toggle in frontend/src/components/TodoItemRow/__tests__/TodoItemRow.test.tsx
+- [X] T049 [P] [US2] Contract tests for completion updates in backend/tests/contract/completion.test.ts
+- [X] T050 [P] [US2] Service tests for completion rules in backend/tests/unit/completionRules.test.ts — MUST explicitly cover all four rules: FR-005 (marking todo complete cascades to subitems), FR-006 (any subitem incomplete marks parent incomplete), FR-017 (all subitems complete auto-completes parent), FR-022 (marking todo incomplete does NOT cascade to subitems — each subitem retains its current state)
+- [X] T051 [P] [US2] Component tests for completion toggle in frontend/src/components/TodoItemRow/__tests__/TodoItemRow.test.tsx
 
 ### Implementation for User Story 2
 
-- [ ] T052 [US2] Implement completion rules in backend/src/services/completionRules.ts
-- [ ] T053 [US2] Update todo/subitem services for completion logic in backend/src/services/todoService.ts and backend/src/services/subItemService.ts — **requires T038** (subitem routes must exist so completion logic can be tested end-to-end against the backend)
-- [ ] T054 [US2] Expose completion updates in backend/src/api/todos.ts and backend/src/api/subitems.ts — **requires T053** (completion service logic must be implemented before routes can expose it) and **requires T038**
-- [ ] T055 [US2] Add completion fetch functions to frontend/src/api/todosApi.ts and frontend/src/api/subitemsApi.ts — plain `PATCH` calls for toggle-complete; no RTK Query (constitution §III)
-- [ ] T056 [P] [US2] Create TodoItemRow component in frontend/src/components/TodoItemRow/TodoItemRow.tsx and frontend/src/components/TodoItemRow/TodoItemRow.styled.ts
-- [ ] T057 [P] [US2] Create SubItemRow component in frontend/src/components/SubItemRow/SubItemRow.tsx and frontend/src/components/SubItemRow/SubItemRow.styled.ts
-- [ ] T058 [US2] Wire completion toggles in frontend/src/containers/AppContainer/AppContainer.tsx — extends wiring added by T047; dispatches completion thunks; does NOT replace existing creation or mount wiring
-- [ ] T059 [P] [US2] Add Storybook stories for completion components: `frontend/src/components/TodoItemRow/__stories__/TodoItemRow.stories.tsx` and `frontend/src/components/SubItemRow/__stories__/SubItemRow.stories.tsx`
+- [X] T052 [US2] Implement completion rules in backend/src/services/completionRules.ts
+- [X] T053 [US2] Update todo/subitem services for completion logic in backend/src/services/todoService.ts and backend/src/services/subItemService.ts — **requires T038** (subitem routes must exist so completion logic can be tested end-to-end against the backend)
+- [X] T054 [US2] Expose completion updates in backend/src/api/todos.ts and backend/src/api/subitems.ts — **requires T053** (completion service logic must be implemented before routes can expose it) and **requires T038**
+- [X] T055 [US2] Add completion fetch functions to frontend/src/api/todosApi.ts and frontend/src/api/subitemsApi.ts — plain `PATCH` calls for toggle-complete; no RTK Query (constitution §III)
+- [X] T056 [P] [US2] Create TodoItemRow component in frontend/src/components/TodoItemRow/TodoItemRow.tsx and frontend/src/components/TodoItemRow/TodoItemRow.styled.ts
+- [X] T057 [P] [US2] Create SubItemRow component in frontend/src/components/SubItemRow/SubItemRow.tsx and frontend/src/components/SubItemRow/SubItemRow.styled.ts
+- [X] T058 [US2] Wire completion toggles in frontend/src/containers/AppContainer/AppContainer.tsx — extends wiring added by T047; dispatches completion thunks; does NOT replace existing creation or mount wiring
+- [X] T059 [P] [US2] Add Storybook stories for completion components: `frontend/src/components/TodoItemRow/__stories__/TodoItemRow.stories.tsx` and `frontend/src/components/SubItemRow/__stories__/SubItemRow.stories.tsx`
 
 **Checkpoint**: User Story 2 works independently with correct parent/child completion behavior.
 

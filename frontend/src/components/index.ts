@@ -3,5 +3,7 @@ export { ErrorBanner } from './ErrorBanner';
 export { ListForm } from './ListForm';
 export { ListPanel } from './ListPanel';
 export { SubItemForm } from './SubItemForm';
+export { SubItemRow } from './SubItemRow';
 export { TodoItemForm } from './TodoItemForm';
+export { TodoItemRow } from './TodoItemRow';
 export { TodoListView } from './TodoListView';

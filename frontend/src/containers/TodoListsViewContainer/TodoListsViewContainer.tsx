@@ -1,13 +1,21 @@
 /**
- * T087 – TodoListsViewContainer
+ * T087/T058 – TodoListsViewContainer
  * Fetches todos for the selected list on mount / selectedListId change.
  * Also fetches sub-items when a todo is visible.
+ * T058: dispatches completion thunks for todos and subitems.
  */
 
 import React, { useEffect } from 'react';
 import { ErrorBanner, TodoListView } from '@components';
 import { getTodoListsViewContainerProps } from '@selectors';
-import { createSubItem, createTodo, fetchSubItems, fetchTodos } from '@slices';
+import {
+  createSubItem,
+  createTodo,
+  fetchSubItems,
+  fetchTodos,
+  toggleSubItemComplete,
+  toggleTodoComplete,
+} from '@slices';
 import { useAppDispatch, useAppSelector } from '@store';
 import { Spin } from 'antd';
 
@@ -46,6 +54,14 @@ export function TodoListsViewContainer({
     void dispatch(createSubItem({ todoId, title }));
   };
 
+  const handleToggleTodo = (todoId: string, completed: boolean) => {
+    void dispatch(toggleTodoComplete({ todoId, completed }));
+  };
+
+  const handleToggleSubItem = (subItemId: string, completed: boolean) => {
+    void dispatch(toggleSubItemComplete({ subItemId, completed }));
+  };
+
   if (loading) {
     return (
       <span role="status" aria-label="Loading todos…" style={{ display: 'block', margin: '20vh auto', textAlign: 'center' }}>
@@ -72,6 +88,8 @@ export function TodoListsViewContainer({
       subItemsByTodoId={subItemsByTodoId}
       onAddTodo={handleAddTodo}
       onAddSubItem={handleAddSubItem}
+      onToggleTodo={handleToggleTodo}
+      onToggleSubItem={handleToggleSubItem}
       existingTodoTitles={existingTodoTitles}
     />
   );
