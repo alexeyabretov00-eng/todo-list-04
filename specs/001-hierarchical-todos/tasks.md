@@ -43,18 +43,17 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T016 [P] Configure SQLite connection in backend/src/services/db.ts
 - [ ] T017 [P] Define data models in backend/src/models/todoList.ts, backend/src/models/todoItem.ts, backend/src/models/subItem.ts
 - [ ] T018 [P] Define offline queue model in backend/src/models/offlineOperation.ts
-- [ ] T019 Create validation schemas in backend/src/services/validation.ts
-- [ ] T082 Create database schema and migrations in backend/src/services/migrations/
-- [ ] T083 Enforce uniqueness constraints at DB and validation layers in backend/src/services/validation.ts and backend/src/services/migrations/
+- [ ] T019 Create validation schemas **and** DB-level uniqueness constraints in backend/src/services/validation.ts — covers list name unique across app, todo title unique within list, subitem title unique within todo; Zod schemas plus SQLite UNIQUE index definitions. *(T083 merged here: both validation-layer and DB-layer uniqueness live in this file and in T082 migrations.)*
+- [ ] T082 Create database schema and migrations in backend/src/services/migrations/ — must include UNIQUE constraints from T019 design (list.name, todo title+listId, subitem title+todoId)
 - [ ] T020 [P] Create shared frontend types in frontend/src/types/todos.ts
 - [ ] T021 [P] Create Redux store in frontend/src/store/store.ts
 - [ ] T022 [P] Create RTK Query base API in frontend/src/api/baseApi.ts
 - [ ] T023 [P] Create offline queue service in frontend/src/services/offlineQueue.ts
 - [ ] T072 [P] Add offline sync endpoint implementation in backend/src/api/sync.ts
 - [ ] T073 [P] Add offline sync service implementation in backend/src/services/syncService.ts
-- [ ] T074 [P] Wire offline sync to RTK Query in frontend/src/api/todoApi.ts
+- [ ] T074 [P] Wire offline sync to RTK Query in frontend/src/api/todoApi.ts — **creates the file shell** (baseApi injection, sync mutation); T039/T040/T041 extend this file in that order
 - [ ] T024 [P] Create selectors in frontend/src/selectors/containers.ts
-- [ ] T025 [P] Create root AppContainer in frontend/src/containers/AppContainer/AppContainer.tsx
+- [ ] T025 [P] Create root AppContainer in frontend/src/containers/AppContainer/AppContainer.tsx and frontend/src/containers/AppContainer/AppContainer.styled.ts
 - [ ] T026 [P] Create global styles in frontend/src/styles/globalStyles.ts
 
 ---
@@ -82,14 +81,14 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T036 [P] [US1] Implement list routes in backend/src/api/lists.ts
 - [ ] T037 [P] [US1] Implement todo routes in backend/src/api/todos.ts
 - [ ] T038 [P] [US1] Implement subitem routes in backend/src/api/subitems.ts
-- [ ] T039 [P] [US1] Add list endpoints to frontend RTK Query in frontend/src/api/todoApi.ts
-- [ ] T040 [P] [US1] Add todo endpoints to frontend RTK Query in frontend/src/api/todoApi.ts
-- [ ] T041 [P] [US1] Add subitem endpoints to frontend RTK Query in frontend/src/api/todoApi.ts
-- [ ] T042 [P] [US1] Create ListForm component in frontend/src/components/ListForm/ListForm.tsx
-- [ ] T043 [P] [US1] Create TodoItemForm component in frontend/src/components/TodoItemForm/TodoItemForm.tsx
-- [ ] T044 [P] [US1] Create SubItemForm component in frontend/src/components/SubItemForm/SubItemForm.tsx
-- [ ] T045 [P] [US1] Create ListPanel component in frontend/src/components/ListPanel/ListPanel.tsx
-- [ ] T046 [P] [US1] Create TodoListView component in frontend/src/components/TodoListView/TodoListView.tsx
+- [ ] T039 [P] [US1] Add list endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — **extends file created by T074; run after T074**
+- [ ] T040 [P] [US1] Add todo endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T039
+- [ ] T041 [P] [US1] Add subitem endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T040
+- [ ] T042 [P] [US1] Create ListForm component in frontend/src/components/ListForm/ListForm.tsx and frontend/src/components/ListForm/ListForm.styled.ts
+- [ ] T043 [P] [US1] Create TodoItemForm component in frontend/src/components/TodoItemForm/TodoItemForm.tsx and frontend/src/components/TodoItemForm/TodoItemForm.styled.ts
+- [ ] T044 [P] [US1] Create SubItemForm component in frontend/src/components/SubItemForm/SubItemForm.tsx and frontend/src/components/SubItemForm/SubItemForm.styled.ts
+- [ ] T045 [P] [US1] Create ListPanel component in frontend/src/components/ListPanel/ListPanel.tsx and frontend/src/components/ListPanel/ListPanel.styled.ts
+- [ ] T046 [P] [US1] Create TodoListView component in frontend/src/components/TodoListView/TodoListView.tsx and frontend/src/components/TodoListView/TodoListView.styled.ts
 - [ ] T047 [US1] Wire list/todo/subitem creation in frontend/src/containers/AppContainer/AppContainer.tsx
 - [ ] T048 [P] [US1] Add Storybook stories for new components in frontend/src/components/ListForm/__stories__/ListForm.stories.tsx and related files
 
@@ -115,8 +114,8 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T053 [US2] Update todo/subitem services for completion logic in backend/src/services/todoService.ts and backend/src/services/subItemService.ts
 - [ ] T054 [US2] Expose completion updates in backend/src/api/todos.ts and backend/src/api/subitems.ts
 - [ ] T055 [US2] Add completion mutations to frontend RTK Query in frontend/src/api/todoApi.ts
-- [ ] T056 [P] [US2] Create TodoItemRow component in frontend/src/components/TodoItemRow/TodoItemRow.tsx
-- [ ] T057 [P] [US2] Create SubItemRow component in frontend/src/components/SubItemRow/SubItemRow.tsx
+- [ ] T056 [P] [US2] Create TodoItemRow component in frontend/src/components/TodoItemRow/TodoItemRow.tsx and frontend/src/components/TodoItemRow/TodoItemRow.styled.ts
+- [ ] T057 [P] [US2] Create SubItemRow component in frontend/src/components/SubItemRow/SubItemRow.tsx and frontend/src/components/SubItemRow/SubItemRow.styled.ts
 - [ ] T058 [US2] Wire completion toggles in frontend/src/containers/AppContainer/AppContainer.tsx
 - [ ] T059 [P] [US2] Add Storybook stories for completion components in frontend/src/components/TodoItemRow/__stories__/TodoItemRow.stories.tsx
 
@@ -143,8 +142,8 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T065 [US3] Add edit/delete routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
 - [ ] T066 [US3] Add reorder routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
 - [ ] T067 [US3] Add edit/reorder mutations in frontend/src/api/todoApi.ts
-- [ ] T068 [P] [US3] Create InlineEdit component in frontend/src/components/InlineEdit/InlineEdit.tsx
-- [ ] T069 [P] [US3] Create ReorderList component in frontend/src/components/ReorderList/ReorderList.tsx
+- [ ] T068 [P] [US3] Create InlineEdit component in frontend/src/components/InlineEdit/InlineEdit.tsx and frontend/src/components/InlineEdit/InlineEdit.styled.ts
+- [ ] T069 [P] [US3] Create ReorderList component in frontend/src/components/ReorderList/ReorderList.tsx and frontend/src/components/ReorderList/ReorderList.styled.ts
 - [ ] T070 [US3] Wire edit/delete/reorder in frontend/src/containers/AppContainer/AppContainer.tsx
 - [ ] T071 [P] [US3] Add Storybook stories for editing components in frontend/src/components/InlineEdit/__stories__/InlineEdit.stories.tsx
 
@@ -154,7 +153,7 @@ description: "Task list for hierarchical todo app implementation"
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T075 [P] Add offline sync UI indicators in frontend/src/components/SyncStatus/SyncStatus.tsx
+- [ ] T075 [P] Add offline sync UI indicators in frontend/src/components/SyncStatus/SyncStatus.tsx and frontend/src/components/SyncStatus/SyncStatus.styled.ts
 - [ ] T076 Add sync status wiring in frontend/src/containers/AppContainer/AppContainer.tsx
 - [ ] T077 [P] Add Storybook story for sync status in frontend/src/components/SyncStatus/__stories__/SyncStatus.stories.tsx
 - [ ] T078 Run quickstart validation steps in specs/001-hierarchical-todos/quickstart.md
