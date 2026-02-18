@@ -7,6 +7,8 @@ Auto-generated from all feature plans. Last updated: 2026-02-17
 - SQLite via better-sqlite3 (embedded, single-user); DB file at `backend/data/todos.db`; migrations via custom runner in `backend/src/services/migrations/` (001-hierarchical-todos)
 - TypeScript 5.x, Node.js 24 (LTS) + Storybook 10.2.10 (`@storybook/react-webpack5`), React 19.x, Webpack 5, ts-loader, typescript-plugin-styled-components (001-restore-storybook)
 - N/A – no data model changes (001-restore-storybook)
+- TypeScript (strict mode), Node.js LTS (001-simple-auth)
+- SQLite via `better-sqlite3` (existing) — two new tables: `credentials`, `sessions` (migration `002_auth_schema`) (001-simple-auth)
 
 - TypeScript (strict mode) for frontend, Node.js (latest LTS) for backend + React 19.x, Redux Toolkit, styled-components, Ant Design, react-hook-form, Zod, Webpack, Jest, Storybook (001-hierarchical-todos)
 
@@ -27,10 +29,10 @@ npm test; npm run lint
 TypeScript (strict mode) for frontend, Node.js (latest LTS) for backend: Follow standard conventions
 
 ## Recent Changes
+- 001-simple-auth: Added TypeScript (strict mode), Node.js LTS
 - 001-restore-storybook: Added TypeScript 5.x, Node.js 24 (LTS) + Storybook 10.2.10 (`@storybook/react-webpack5`), React 19.x, Webpack 5, ts-loader, typescript-plugin-styled-components
 - 001-hierarchical-todos: Added TypeScript (strict mode) for frontend, Node.js (latest LTS) for backend + React 19.x, Redux Toolkit, styled-components, Ant Design, react-hook-form, Zod, Webpack, Jest, Storybook, better-sqlite3
 
-- 001-hierarchical-todos: Added TypeScript (strict mode) for frontend, Node.js (latest LTS) for backend + React 19.x, Redux Toolkit, styled-components, Ant Design, react-hook-form, Zod, Webpack, Jest, Storybook
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

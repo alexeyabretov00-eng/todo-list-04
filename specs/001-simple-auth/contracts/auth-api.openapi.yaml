@@ -1,0 +1,204 @@
+openapi: "3.0.3"
+info:
+  title: Auth API — Simple Login/Password Authentication
+  version: "1.0.0"
+  description: |
+    Authentication endpoints for feature 001-simple-auth.
+    All endpoints are mounted at /api/auth/*.
+    Auth routes are exempt from the requireAuth middleware.
+    All other /api/* routes require a valid session cookie after this feature is implemented.
+
+servers:
+  - url: http://localhost:4000/api
+    description: Local development
+
+paths:
+  /auth/login:
+    post:
+      summary: Authenticate the owner and issue a session
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful; session cookie set
+          headers:
+            Set-Cookie:
+              description: HttpOnly session cookie (session_token=<token>; HttpOnly; SameSite=Strict; Path=/; Max-Age=86400)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          description: Validation error (empty field)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Username and password are required"
+        '401':
+          description: Credentials incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Invalid credentials"
+        '503':
+          description: Application not configured (no owner credential seeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Application not configured"
+
+  /auth/logout:
+    post:
+      summary: Terminate the current session
+      operationId: logout
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Session invalidated; cookie cleared
+          headers:
+            Set-Cookie:
+              description: Clears session_token cookie (session_token=; Max-Age=0)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/me:
+    get:
+      summary: Check if the current session is valid
+      operationId: checkAuth
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Session is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated:
+                    type: boolean
+                    example: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/password:
+    put:
+      summary: Change the owner password — invalidates all sessions
+      operationId: changePassword
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: Password changed; all sessions invalidated; cookie cleared
+          headers:
+            Set-Cookie:
+              description: Clears session_token cookie (session_token=; Max-Age=0)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          description: Validation error (empty field or new password < 8 chars)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Password must be at least 8 characters"
+        '401':
+          description: Current password incorrect or no valid session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Current password is incorrect"
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Owner's username (any non-empty string)
+          example: "admin"
+        password:
+          type: string
+          minLength: 1
+          description: Owner's password (plain text — transmitted over HTTPS only)
+          example: "my-secure-password"
+
+    ChangePasswordRequest:
+      type: object
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          type: string
+          minLength: 1
+          description: The current password (for verification)
+        newPassword:
+          type: string
+          minLength: 8
+          description: The new password (minimum 8 characters)
+
+    OkResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid credentials"
+
+  responses:
+    Unauthorized:
+      description: No valid session cookie present or session expired
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Unauthorized"
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_token
+      description: HttpOnly session token cookie issued by POST /api/auth/login

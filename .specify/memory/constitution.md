@@ -3,9 +3,11 @@
 ## Core Principles
 
 ### I. Single-User Architecture
-The application is designed for a single user without authentication requirements. All functionality assumes single-user context: no user management, no access control, no multi-tenancy concerns. This simplifies architecture but MUST NOT compromise data integrity or future extensibility should multi-user support be required.
+The application is designed for a single owner-user. All functionality assumes single-user context: no multi-user account management, no multi-tenancy concerns. This simplifies architecture but MUST NOT compromise data integrity or future extensibility should multi-user support be required.
 
-**Rationale**: Reduces complexity, eliminates authentication overhead, enables rapid development and deployment.
+**Amendment (2026-02-18 — feature `001-simple-auth`)**: Access protection via a single owner credential (username + password) is permitted. The owner may change their password via an in-app settings screen. There is no user registration, no account management UI, and no per-user data isolation. Authentication overhead is accepted as a deliberate tradeoff to protect the owner's data from unauthorized access.
+
+**Rationale**: Reduces complexity, enables rapid development and deployment. Single-owner access protection is permitted where the owner explicitly requires it.
 
 ### II. Cross-Platform Responsive Design
 The application MUST provide seamless experience across desktop and mobile devices through responsive layout. UI components MUST adapt to viewport dimensions, touch vs. mouse interactions, and varying screen densities. Progressive Web App (PWA) capabilities are mandatory for offline support and app-like experience on mobile.
