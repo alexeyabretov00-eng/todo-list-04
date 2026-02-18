@@ -1,12 +1,16 @@
 import type { Database } from 'better-sqlite3';
 import * as migration001 from './001_initial_schema';
+import * as migration002 from './002_auth_schema';
 
 interface Migration {
   version: number;
   up: (db: Database) => void;
 }
 
-const migrations: Migration[] = [{ version: 1, up: migration001.up }];
+const migrations: Migration[] = [
+  { version: 1, up: migration001.up },
+  { version: 2, up: migration002.up },
+];
 
 /**
  * Runs all pending migrations in version order.

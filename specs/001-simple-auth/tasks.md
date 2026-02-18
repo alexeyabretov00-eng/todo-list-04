@@ -15,7 +15,7 @@
 
 **Purpose**: Add the two new backend runtime dependencies before any feature work begins.
 
-- [ ] T001 Add `bcryptjs`, `cookie-parser`, `@types/bcryptjs`, `@types/cookie-parser` to `backend/package.json` and install
+- [X] T001 Add `bcryptjs`, `cookie-parser`, `@types/bcryptjs`, `@types/cookie-parser` to `backend/package.json` and install
 
 ---
 
@@ -23,11 +23,11 @@
 
 **Purpose**: Database schema, session/credential service layer, and middleware must exist before any user story can be implemented. No user story work begins until this phase is complete.
 
-- [ ] T002 Create `backend/src/services/migrations/002_auth_schema.ts` — `credentials` table (id, username, password_hash, created_at, updated_at) + `sessions` table (token, created_at, expires_at); seed from `OWNER_USERNAME`/`OWNER_PASSWORD` env vars if table is empty
-- [ ] T003 Register migration 002 in `backend/src/services/migrations/runner.ts` — add `import * as migration002 from './002_auth_schema'` and push `{ version: 2, up: migration002.up }` to the migrations array
-- [ ] T004 [P] Implement `backend/src/services/authService.ts` — `getCredential`, `verifyPassword`, `hashPassword`, `updatePassword`, `createSession`, `validateSession`, `deleteSession`, `deleteAllSessions`, `cleanExpiredSessions` (see data-model.md for full signatures)
-- [ ] T005 [P] Implement `backend/src/middleware/requireAuth.ts` — read `req.cookies['session_token']`; call `validateSession`; if missing or expired return `res.status(401).json({ error: 'Unauthorized' })`; otherwise `next()`
-- [ ] T006 Add `cookie-parser` middleware to `backend/src/server.ts` — `import cookieParser from 'cookie-parser'` and `app.use(cookieParser())` before route mounting
+- [X] T002 Create `backend/src/services/migrations/002_auth_schema.ts` — `credentials` table (id, username, password_hash, created_at, updated_at) + `sessions` table (token, created_at, expires_at); seed from `OWNER_USERNAME`/`OWNER_PASSWORD` env vars if table is empty
+- [X] T003 Register migration 002 in `backend/src/services/migrations/runner.ts` — add `import * as migration002 from './002_auth_schema'` and push `{ version: 2, up: migration002.up }` to the migrations array
+- [X] T004 [P] Implement `backend/src/services/authService.ts` — `getCredential`, `verifyPassword`, `hashPassword`, `updatePassword`, `createSession`, `validateSession`, `deleteSession`, `deleteAllSessions`, `cleanExpiredSessions` (see data-model.md for full signatures)
+- [X] T005 [P] Implement `backend/src/middleware/requireAuth.ts` — read `req.cookies['session_token']`; call `validateSession`; if missing or expired return `res.status(401).json({ error: 'Unauthorized' })`; otherwise `next()`
+- [X] T006 Add `cookie-parser` middleware to `backend/src/server.ts` — `import cookieParser from 'cookie-parser'` and `app.use(cookieParser())` before route mounting
 
 **Checkpoint**: Database tables exist, authService functions are callable, requireAuth middleware exists — user story implementation can begin
 
