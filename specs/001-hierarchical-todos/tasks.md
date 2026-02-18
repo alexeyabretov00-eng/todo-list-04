@@ -44,7 +44,7 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T016 [P] Configure SQLite connection in backend/src/services/db.ts
 - [ ] T017 [P] Define data models in backend/src/models/todoList.ts, backend/src/models/todoItem.ts, backend/src/models/subItem.ts
 - [ ] T018 [P] Define offline queue model in backend/src/models/offlineOperation.ts
-- [ ] T019 Create validation schemas **and** DB-level uniqueness constraints in backend/src/services/validation.ts — covers list name unique across app, todo title unique within list, subitem title unique within todo; Zod schemas plus SQLite UNIQUE index definitions. *(T083 merged here: both validation-layer and DB-layer uniqueness live in this file and in T082 migrations.)*
+- [ ] T019 Create validation schemas **and** DB-level uniqueness constraints in backend/src/services/validation.ts — covers list name unique across app, todo title unique within list, subitem title unique within todo; Zod schemas (`z.string().max(255)`) plus SQLite UNIQUE index definitions; includes DB-layer uniqueness constraints mirrored in T082 migrations (list.name, todo title+listId, subitem title+todoId)
 - [ ] T082 Create database schema and migrations in backend/src/services/migrations/ — must include UNIQUE constraints from T019 design (list.name, todo title+listId, subitem title+todoId)
 - [ ] T020 [P] Create shared frontend types in frontend/src/types/todos.ts
 - [ ] T021 [P] Create Redux store in frontend/src/store/store.ts
@@ -52,6 +52,7 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T023 [P] Create offline queue service in frontend/src/services/offlineQueue.ts
 - [ ] T072 [P] Add offline sync endpoint implementation in backend/src/api/sync.ts
 - [ ] T073 [P] Add offline sync service implementation in backend/src/services/syncService.ts — MUST implement last-write-wins by comparing timestamps on conflicting operations (see T086 for test coverage)
+- [ ] T086 [P] Unit tests for last-write-wins conflict resolution in backend/tests/unit/syncConflict.test.ts — validates FR-013: when two operations modify the same item, the one with the most recent `updatedAt` timestamp wins after sync; MUST be completed before T073 is considered done (TDD gate)
 - [ ] T074 [P] Wire offline sync to RTK Query in frontend/src/api/todoApi.ts — **creates the file shell** (baseApi injection, sync mutation); T039/T040/T041 extend this file in that order
 - [ ] T024 [P] Create selectors in frontend/src/selectors/containers.ts
 - [ ] T025 [P] Create root AppContainer in frontend/src/containers/AppContainer/AppContainer.tsx and frontend/src/containers/AppContainer/AppContainer.styled.ts
@@ -82,17 +83,18 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T036 [P] [US1] Implement list routes in backend/src/api/lists.ts
 - [ ] T037 [P] [US1] Implement todo routes in backend/src/api/todos.ts
 - [ ] T038 [P] [US1] Implement subitem routes in backend/src/api/subitems.ts
-- [ ] T039 [P] [US1] Add list endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — **extends file created by T074; run after T074**
-- [ ] T040 [P] [US1] Add todo endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T039
-- [ ] T041 [P] [US1] Add subitem endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T040
+- [ ] T039 [US1] Add list endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — **extends file created by T074; run after T074**
+- [ ] T040 [US1] Add todo endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T039
+- [ ] T041 [US1] Add subitem endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T040
 - [ ] T042 [P] [US1] Create ListForm component in frontend/src/components/ListForm/ListForm.tsx and frontend/src/components/ListForm/ListForm.styled.ts — MUST display inline validation error when a duplicate list name is entered (Zod + react-hook-form); mirrors FR-014
-- [ ] T043 [P] [US1] Create TodoItemForm component in frontend/src/components/TodoItemForm/TodoItemForm.tsx and frontend/src/components/TodoItemForm/TodoItemForm.styled.ts
-- [ ] T044 [P] [US1] Create SubItemForm component in frontend/src/components/SubItemForm/SubItemForm.tsx and frontend/src/components/SubItemForm/SubItemForm.styled.ts
+- [ ] T043 [P] [US1] Create TodoItemForm component in frontend/src/components/TodoItemForm/TodoItemForm.tsx and frontend/src/components/TodoItemForm/TodoItemForm.styled.ts — MUST display inline validation error when a duplicate todo title is entered within the same list (Zod + react-hook-form); mirrors FR-015; MUST reject titles exceeding 255 characters with an inline error; mirrors FR-019
+- [ ] T044 [P] [US1] Create SubItemForm component in frontend/src/components/SubItemForm/SubItemForm.tsx and frontend/src/components/SubItemForm/SubItemForm.styled.ts — MUST display inline validation error when a duplicate subitem title is entered within the same todo (Zod + react-hook-form); mirrors FR-016; MUST reject titles exceeding 255 characters with an inline error; mirrors FR-019
 - [ ] T045 [P] [US1] Create ListPanel component in frontend/src/components/ListPanel/ListPanel.tsx and frontend/src/components/ListPanel/ListPanel.styled.ts
 - [ ] T046 [P] [US1] Create TodoListView component in frontend/src/components/TodoListView/TodoListView.tsx and frontend/src/components/TodoListView/TodoListView.styled.ts
 - [ ] T047 [US1] Wire list/todo/subitem creation in frontend/src/containers/AppContainer/AppContainer.tsx
 - [ ] T087 [US1] Create TodoListsViewContainer in frontend/src/containers/TodoListsViewContainer/TodoListsViewContainer.tsx and frontend/src/containers/TodoListsViewContainer/TodoListsViewContainer.styled.ts — renders the active list's todos and subitems; add `getTodoListsViewContainerProps` selector in frontend/src/selectors/containers.ts
-- [ ] T048 [P] [US1] Add Storybook stories for new components in frontend/src/components/ListForm/__stories__/ListForm.stories.tsx and related files
+- [ ] T088 [P] [US1] Create ErrorBanner component in frontend/src/components/ErrorBanner/ErrorBanner.tsx and frontend/src/components/ErrorBanner/ErrorBanner.styled.ts — renders error message and a retry button; used by AppContainer when `GET /api/lists` returns a non-2xx response on startup; mirrors FR-021 and research Decision 9; component test in frontend/src/components/ErrorBanner/__tests__/ErrorBanner.test.tsx MUST cover: (a) banner renders with message and retry button, (b) onRetry callback fires on button click
+- [ ] T048 [P] [US1] Add Storybook stories for new components in frontend/src/components/ListForm/__stories__/ListForm.stories.tsx, frontend/src/components/ErrorBanner/__stories__/ErrorBanner.stories.tsx, and related files
 
 **Checkpoint**: User Story 1 is functional and independently testable.
 
@@ -108,7 +110,6 @@ description: "Task list for hierarchical todo app implementation"
 
 - [ ] T049 [P] [US2] Contract tests for completion updates in backend/tests/contract/completion.test.ts
 - [ ] T050 [P] [US2] Service tests for completion rules in backend/tests/unit/completionRules.test.ts
-- [ ] T086 [P] [US2] Unit tests for last-write-wins conflict resolution in backend/tests/unit/syncConflict.test.ts — validates FR-013: when two operations modify the same item, the one with the most recent timestamp wins after sync
 - [ ] T051 [P] [US2] Component tests for completion toggle in frontend/src/components/TodoItemRow/__tests__/TodoItemRow.test.tsx
 
 ### Implementation for User Story 2
@@ -140,7 +141,7 @@ description: "Task list for hierarchical todo app implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T063 [US3] Implement rename/delete in backend/src/services/listService.ts, backend/src/services/todoService.ts, backend/src/services/subItemService.ts
+- [ ] T063 [US3] Extend listService, todoService, and subItemService to add rename (PATCH) and delete operations in backend/src/services/listService.ts, backend/src/services/todoService.ts, backend/src/services/subItemService.ts — builds on CRUD scaffolding from T033/T034/T035; do not duplicate existing create/read methods
 - [ ] T064 [US3] Implement reorder service in backend/src/services/reorderService.ts
 - [ ] T065 [US3] Add edit/delete routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
 - [ ] T066 [US3] Add reorder routes in backend/src/api/lists.ts, backend/src/api/todos.ts, backend/src/api/subitems.ts
@@ -178,6 +179,7 @@ description: "Task list for hierarchical todo app implementation"
 - **US1 (P1)**: Depends on Foundational only.
 - **US2 (P2)**: Depends on Foundational and US1 APIs for todos/subitems.
 - **US3 (P3)**: Depends on Foundational and US1 entities; can be parallelized after US1 models/services.
+- **T086**: Must complete before T073 is considered done (TDD gate — syncService has no tests otherwise until Phase 4).
 
 ### Parallel Execution Examples
 
@@ -186,6 +188,7 @@ description: "Task list for hierarchical todo app implementation"
 - T027, T028, T029 can run in parallel (contract tests).
 - T033, T034, T035 can run in parallel (services).
 - T042, T043, T044 can run in parallel (form components).
+- T045, T046, T088 can run in parallel (panel, list view, error banner components).
 
 **User Story 2**
 
