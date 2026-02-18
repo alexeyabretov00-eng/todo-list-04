@@ -3,8 +3,8 @@
  * Covers: (a) renders message, (b) renders CTA label, (c) onCta fires on click
  */
 
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+
 import { EmptyState } from '../EmptyState';
 
 describe('EmptyState', () => {

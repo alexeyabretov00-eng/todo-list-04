@@ -3,9 +3,9 @@
  * Validates: render, submission, duplicate name inline validation (FR-014), 255-char limit (FR-019)
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { ListForm } from '../ListForm';
 
 describe('ListForm', () => {

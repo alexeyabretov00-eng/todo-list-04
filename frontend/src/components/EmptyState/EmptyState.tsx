@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+
 import { CtaButton, EmptyMessage, EmptyStateWrapper } from './EmptyState.styled';
 
 interface EmptyStateProps {

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+
 import { ListPanel } from '../ListPanel';
 
 const sampleLists: TodoList[] = [

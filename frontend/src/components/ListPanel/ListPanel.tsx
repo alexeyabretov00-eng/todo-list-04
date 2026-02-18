@@ -4,8 +4,10 @@
  */
 
 import React from 'react';
+
 import { EmptyState } from '../EmptyState';
 import { ListForm } from '../ListForm';
+
 import { ListItem, PanelTitle, PanelWrapper } from './ListPanel.styled';
 
 interface ListPanelProps {

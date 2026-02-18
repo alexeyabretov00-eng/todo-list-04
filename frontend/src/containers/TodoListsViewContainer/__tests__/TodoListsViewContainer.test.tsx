@@ -7,13 +7,12 @@
  * (c) getTodoListsViewContainerProps selector returns correct shape
  */
 
-import React from 'react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { render, screen } from '@testing-library/react';
 
-import { TodoListsViewContainer } from '../TodoListsViewContainer';
 import { getTodoListsViewContainerProps } from '../../../selectors/containers';
+import { TodoListsViewContainer } from '../TodoListsViewContainer';
 
 // ─── Module mocks ─────────────────────────────────────────────────────────────
 
@@ -126,7 +125,6 @@ describe('getTodoListsViewContainerProps selector', () => {
       subitems: { byTodoId: {}, loading: false, error: null },
       ui: { selectedListId: LIST_ID },
     };
-    // @ts-ignore partial RootState for test
     const result = getTodoListsViewContainerProps(state);
     expect(result.todos).toHaveLength(1);
     expect(result.todos[0]?.title).toBe('Write tests');
@@ -144,7 +142,6 @@ describe('getTodoListsViewContainerProps selector', () => {
       subitems: { byTodoId: {}, loading: false, error: null },
       ui: { selectedListId: null },
     };
-    // @ts-ignore partial RootState for test
     const result = getTodoListsViewContainerProps(state);
     expect(result.todos).toHaveLength(0);
     expect(result.selectedListId).toBeNull();

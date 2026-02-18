@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { createList, fetchLists, selectList } from '@slices';
 import { useAppDispatch, useAppSelector } from '@store';
 
-import { getAppContainerProps } from '../../selectors/containers';
 import { ErrorBanner } from '../../components/ErrorBanner';
 import { ListPanel } from '../../components/ListPanel';
+import { getAppContainerProps } from '../../selectors/containers';
 import { TodoListsViewContainer } from '../TodoListsViewContainer';
 
 import {

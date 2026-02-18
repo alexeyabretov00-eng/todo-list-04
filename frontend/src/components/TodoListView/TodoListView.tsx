@@ -5,9 +5,11 @@
  */
 
 import React from 'react';
+
 import { EmptyState } from '../EmptyState';
-import { TodoItemForm } from '../TodoItemForm';
 import { SubItemForm } from '../SubItemForm';
+import { TodoItemForm } from '../TodoItemForm';
+
 import {
   TodoItemContainer,
   TodoTitle,

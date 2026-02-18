@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+
 import { BannerWrapper, ErrorMessage, RetryButton } from './ErrorBanner.styled';
 
 interface ErrorBannerProps {

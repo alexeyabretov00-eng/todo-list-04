@@ -8,9 +8,9 @@ import React, { useEffect } from 'react';
 import { createSubItem, createTodo, fetchSubItems, fetchTodos } from '@slices';
 import { useAppDispatch, useAppSelector } from '@store';
 
-import { getTodoListsViewContainerProps } from '../../selectors/containers';
-import { TodoListView } from '../../components/TodoListView';
 import { ErrorBanner } from '../../components/ErrorBanner';
+import { TodoListView } from '../../components/TodoListView';
+import { getTodoListsViewContainerProps } from '../../selectors/containers';
 import { LoadingIndicator } from '../AppContainer/AppContainer.styled';
 
 interface TodoListsViewContainerProps {

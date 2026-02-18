@@ -1,13 +1,13 @@
 export type { ListsState } from './listsSlice';
 export {
   addList,
-  fetchLists,
   createList,
-  renameList,
   deleteList,
-  reorderLists,
+  fetchLists,
   listsSlice,
   removeList,
+  renameList,
+  reorderLists,
   setLists,
   updateList,
 } from './listsSlice';

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+
 import { TodoListView } from '../TodoListView';
 
 const sampleTodos: TodoItem[] = [
