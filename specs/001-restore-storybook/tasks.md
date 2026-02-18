@@ -28,7 +28,7 @@
 
 **⚠️ CRITICAL**: Phases 3–5 cannot be independently tested until this phase is complete.
 
-- [ ] T001 Fix `require()`/`__dirname` CJS usage in `frontend/.storybook/main.ts` — replace with ESM `import()`/`fileURLToPath` and make `webpackFinal` async so Storybook 10.x ESM loader can load the config without a `ReferenceError`
+- [X] T001 Fix `require()`/`__dirname` CJS usage in `frontend/.storybook/main.ts` — replace with ESM `import()`/`fileURLToPath` and make `webpackFinal` async so Storybook 10.x ESM loader can load the config without a `ReferenceError`
 
 **Checkpoint**: Run `node node_modules/storybook/dist/bin/dispatcher.js build` from `frontend/`. Build must complete without `ReferenceError: require is not defined`. All stories may still have individual errors — those are addressed in Phases 3–5.
 
@@ -42,8 +42,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T002 [P] [US1] Add missing required props `onToggleTodo: () => undefined` and `onToggleSubItem: () => undefined` to `args` in `frontend/src/components/TodoListView/__stories__/TodoListView.stories.tsx`
-- [ ] T003 [P] [US1] Move `typeRoots` from root level into `compilerOptions` in `frontend/tsconfig.json` so TypeScript strict-mode resolves `src/types/types.d.ts` via the explicitly configured `typeRoots` rather than silently falling back to defaults
+- [X] T002 [P] [US1] Add missing required props `onToggleTodo: () => undefined` and `onToggleSubItem: () => undefined` to `args` in `frontend/src/components/TodoListView/__stories__/TodoListView.stories.tsx`
+- [X] T003 [P] [US1] Move `typeRoots` from root level into `compilerOptions` in `frontend/tsconfig.json` so TypeScript strict-mode resolves `src/types/types.d.ts` via the explicitly configured `typeRoots` rather than silently falling back to defaults
 
 **Checkpoint**: All 12 story files render without canvas errors. User Story 1 is fully functional and independently testable.
 
@@ -83,10 +83,10 @@
 
 **Purpose**: Validation run confirming all success criteria from spec.md.
 
-- [ ] T004 [P] Run Storybook build (`node node_modules/storybook/dist/bin/dispatcher.js build` from `frontend/`) and confirm exit code 0 and zero TypeScript errors — satisfies SC-003
-- [ ] T005 [P] Start Storybook dev server and manually navigate all 12 component stories, confirming each renders without a canvas error — satisfies SC-001
-- [ ] T006 [P] Confirm Storybook starts in under 60 seconds on the development machine — satisfies SC-002
-- [ ] T007 Confirm Jest test suite still passes after `tsconfig.json` change: run `node node_modules/jest/bin/jest.js --no-coverage --forceExit` from `frontend/`
+- [X] T004 [P] Run Storybook build (`node node_modules/storybook/dist/bin/dispatcher.js build` from `frontend/`) and confirm exit code 0 and zero TypeScript errors — satisfies SC-003
+- [X] T005 [P] Start Storybook dev server and manually navigate all 12 component stories, confirming each renders without a canvas error — satisfies SC-001
+- [X] T006 [P] Confirm Storybook starts in under 60 seconds on the development machine — satisfies SC-002
+- [X] T007 Confirm Jest test suite still passes after `tsconfig.json` change: run `node node_modules/jest/bin/jest.js --no-coverage --forceExit` from `frontend/`
 
 ---
 

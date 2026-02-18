@@ -18,7 +18,7 @@ export default defineConfig([
     },
   },
   {
-    ignores: ['build/', 'dist/', 'coverage/'],
+    ignores: ['build/', 'dist/', 'coverage/', 'node_modules/', 'storybook-static/'],
   },
   tseslint.configs.recommended,
   {

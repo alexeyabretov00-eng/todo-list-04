@@ -21,7 +21,8 @@ export default (env, argv) => {
       clean: true,
     },
     resolve: {
-      extensions: ['.ts', '.tsx', '.js', '.jsx'],
+      extensions: ['.tsx', '.ts', '.js'],
+      modules: [path.join(root, './src'), 'node_modules'],
       alias: {
         '@components': path.resolve(root, 'src/components'),
         '@hooks': path.resolve(root, 'src/hooks'),
@@ -39,7 +40,7 @@ export default (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.tsx?$/,
+          test: /\.(tsx|ts|js)?$/,
           use: [
             {
               loader: 'ts-loader',

@@ -8,6 +8,7 @@
 import React from 'react';
 import { InlineEdit } from '@components';
 import { Checkbox, Typography } from 'antd';
+
 import { RowContainer } from './SubItemRow.styled';
 
 const { Text } = Typography;

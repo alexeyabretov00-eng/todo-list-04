@@ -5,8 +5,8 @@
  */
 
 import React from 'react';
-import { EmptyState, InlineEdit, ListForm, ReorderList } from '@components';
 import type { ReorderListItemData } from '@components';
+import { EmptyState, InlineEdit, ListForm, ReorderList } from '@components';
 import { Layout, Typography } from 'antd';
 
 const { Sider } = Layout;

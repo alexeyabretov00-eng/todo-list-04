@@ -54,6 +54,8 @@ const meta: Meta<typeof TodoListView> = {
     existingTodoTitles: sampleTodos.map((t) => t.title),
     onAddTodo: () => undefined,
     onAddSubItem: () => undefined,
+    onToggleTodo: () => undefined,
+    onToggleSubItem: () => undefined,
   },
 };
 

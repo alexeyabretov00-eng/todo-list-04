@@ -7,8 +7,8 @@
  */
 
 import React from 'react';
-import { EmptyState, ReorderList, SubItemForm, TodoItemForm, TodoItemRow } from '@components';
 import type { ReorderListItemData } from '@components';
+import { EmptyState, ReorderList, SubItemForm, TodoItemForm, TodoItemRow } from '@components';
 import { Card, Layout, Typography } from 'antd';
 
 const { Title } = Typography;
