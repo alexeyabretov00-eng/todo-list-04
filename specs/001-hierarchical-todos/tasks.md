@@ -16,20 +16,21 @@ description: "Task list for hierarchical todo app implementation"
 **Purpose**: Project initialization and base tooling
 
 - [ ] T001 Create frontend/backend folder structure in frontend/src/ and backend/src/
-- [ ] T002 Initialize backend package and scripts in backend/package.json
-- [ ] T003 Initialize frontend package and scripts in frontend/package.json
+- [ ] T002 Initialize backend package and scripts in backend/package.json — all dependency versions MUST be exact (no `^` or `~` prefixes); install latest stable versions at time of creation
+- [ ] T003 Initialize frontend package and scripts in frontend/package.json — all dependency versions MUST be exact (no `^` or `~` prefixes); install latest stable versions at time of creation
 - [ ] T004 [P] Configure backend TypeScript in backend/tsconfig.json
 - [ ] T005 [P] Configure frontend TypeScript + path aliases in frontend/tsconfig.json
 - [ ] T006 [P] Configure Webpack build and alias resolution in frontend/webpack.config.js
 - [ ] T007 [P] Configure ESLint + Prettier for frontend in frontend/.eslintrc.cjs and frontend/.prettierrc
 - [ ] T008 [P] Configure ESLint + Prettier for backend in backend/.eslintrc.cjs and backend/.prettierrc
-- [ ] T009 [P] Configure Jest in frontend/jest.config.ts and backend/jest.config.ts
+- [ ] T009 [P] Configure Jest in frontend/jest.config.ts and backend/jest.config.ts — MUST include `coverageThreshold: { global: { lines: 80, branches: 80, functions: 80, statements: 80 } }` to enforce constitution §IV ≥80% coverage gate; add `"test:coverage": "jest --coverage"` npm script to both packages
 - [ ] T010 [P] Configure Storybook in frontend/.storybook/main.ts and frontend/.storybook/preview.ts
 - [ ] T011 [P] Add commitlint configuration in commitlint.config.cjs
 - [ ] T012 [P] Add environment templates in frontend/.env.example and backend/.env.example
 - [ ] T079 [P] Add PWA manifest in frontend/public/manifest.json
 - [ ] T080 [P] Add service worker registration in frontend/src/services/serviceWorker.ts
-- [ ] T081 [P] Configure offline asset caching strategy in frontend/src/services/offlineCache.ts
+- [ ] T081 [P] Configure offline asset caching strategy in frontend/src/services/offlineCache.ts — cache-first for static assets (JS, CSS, images); network-first for API requests; document strategy in comments
+- [ ] T085 [P] Add npm script to validate no version prefixes exist in frontend/package.json and backend/package.json — e.g., a `check:versions` script that fails if any dependency value starts with `^` or `~`
 
 ---
 
@@ -50,7 +51,7 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T022 [P] Create RTK Query base API in frontend/src/api/baseApi.ts
 - [ ] T023 [P] Create offline queue service in frontend/src/services/offlineQueue.ts
 - [ ] T072 [P] Add offline sync endpoint implementation in backend/src/api/sync.ts
-- [ ] T073 [P] Add offline sync service implementation in backend/src/services/syncService.ts
+- [ ] T073 [P] Add offline sync service implementation in backend/src/services/syncService.ts — MUST implement last-write-wins by comparing timestamps on conflicting operations (see T086 for test coverage)
 - [ ] T074 [P] Wire offline sync to RTK Query in frontend/src/api/todoApi.ts — **creates the file shell** (baseApi injection, sync mutation); T039/T040/T041 extend this file in that order
 - [ ] T024 [P] Create selectors in frontend/src/selectors/containers.ts
 - [ ] T025 [P] Create root AppContainer in frontend/src/containers/AppContainer/AppContainer.tsx and frontend/src/containers/AppContainer/AppContainer.styled.ts
@@ -84,12 +85,13 @@ description: "Task list for hierarchical todo app implementation"
 - [ ] T039 [P] [US1] Add list endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — **extends file created by T074; run after T074**
 - [ ] T040 [P] [US1] Add todo endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T039
 - [ ] T041 [P] [US1] Add subitem endpoints to frontend RTK Query in frontend/src/api/todoApi.ts — extends after T040
-- [ ] T042 [P] [US1] Create ListForm component in frontend/src/components/ListForm/ListForm.tsx and frontend/src/components/ListForm/ListForm.styled.ts
+- [ ] T042 [P] [US1] Create ListForm component in frontend/src/components/ListForm/ListForm.tsx and frontend/src/components/ListForm/ListForm.styled.ts — MUST display inline validation error when a duplicate list name is entered (Zod + react-hook-form); mirrors FR-014
 - [ ] T043 [P] [US1] Create TodoItemForm component in frontend/src/components/TodoItemForm/TodoItemForm.tsx and frontend/src/components/TodoItemForm/TodoItemForm.styled.ts
 - [ ] T044 [P] [US1] Create SubItemForm component in frontend/src/components/SubItemForm/SubItemForm.tsx and frontend/src/components/SubItemForm/SubItemForm.styled.ts
 - [ ] T045 [P] [US1] Create ListPanel component in frontend/src/components/ListPanel/ListPanel.tsx and frontend/src/components/ListPanel/ListPanel.styled.ts
 - [ ] T046 [P] [US1] Create TodoListView component in frontend/src/components/TodoListView/TodoListView.tsx and frontend/src/components/TodoListView/TodoListView.styled.ts
 - [ ] T047 [US1] Wire list/todo/subitem creation in frontend/src/containers/AppContainer/AppContainer.tsx
+- [ ] T087 [US1] Create TodoListsViewContainer in frontend/src/containers/TodoListsViewContainer/TodoListsViewContainer.tsx and frontend/src/containers/TodoListsViewContainer/TodoListsViewContainer.styled.ts — renders the active list's todos and subitems; add `getTodoListsViewContainerProps` selector in frontend/src/selectors/containers.ts
 - [ ] T048 [P] [US1] Add Storybook stories for new components in frontend/src/components/ListForm/__stories__/ListForm.stories.tsx and related files
 
 **Checkpoint**: User Story 1 is functional and independently testable.
@@ -106,6 +108,7 @@ description: "Task list for hierarchical todo app implementation"
 
 - [ ] T049 [P] [US2] Contract tests for completion updates in backend/tests/contract/completion.test.ts
 - [ ] T050 [P] [US2] Service tests for completion rules in backend/tests/unit/completionRules.test.ts
+- [ ] T086 [P] [US2] Unit tests for last-write-wins conflict resolution in backend/tests/unit/syncConflict.test.ts — validates FR-013: when two operations modify the same item, the one with the most recent timestamp wins after sync
 - [ ] T051 [P] [US2] Component tests for completion toggle in frontend/src/components/TodoItemRow/__tests__/TodoItemRow.test.tsx
 
 ### Implementation for User Story 2

@@ -23,7 +23,7 @@ Deliver a single-user hierarchical todo app that supports lists, todos, and subi
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+*GATE: Must pass before research phase. Re-check after design phase. (Note: plan.md phases refer to pre-implementation planning; implementation phases are numbered 1–6 in tasks.md.)*
 
 - Single-user architecture, no authentication. (Pass)
 - Responsive design with PWA offline support. (Pass)
@@ -33,7 +33,7 @@ Deliver a single-user hierarchical todo app that supports lists, todos, and subi
 - React 19 + Redux Toolkit + Ant Design; fetch API client; Webpack build. (Pass)
 - Named imports/exports only; container naming conventions. (Pass)
 
-**Post-Phase 1 Re-check**: No changes required; all constitution gates still pass.
+**Post-Design Re-check**: No changes required; all constitution gates still pass.
 
 ## Project Structure
 
