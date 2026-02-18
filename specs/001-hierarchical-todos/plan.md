@@ -31,8 +31,8 @@ Deliver a single-user hierarchical todo app that supports lists, todos, and subi
 - Test-first quality with Jest ≥80% coverage, co-located tests and stories. (Pass)
 - Presentational components with container logic; TypeScript strict; styled-components. (Pass)
 - React 19 + Redux Toolkit + Ant Design; fetch API client (NO RTK Query per constitution §III); Webpack build (ts-loader; no Babel; typescript-plugin-styled-components). (Pass)
-- ts-jest configured as Jest transformer; no Babel in test pipeline. (Pass)
-- Named imports/exports only; container naming conventions. (Pass)
+- ts-jest configured as Jest transformer; no Babel in test pipeline. `moduleNameMapper` derived from `tsconfig.json` via `pathsToModuleNameMapper` (single source of truth for aliases). (Pass)
+- Named imports/exports only; no wildcard imports or exports. Every aliased folder has a barrel `index.ts`; consumers import via bare alias (e.g. `@slices`), never via deep paths. Container naming conventions. (Pass)
 
 **Post-Design Re-check**: No changes required; all constitution gates still pass.
 
@@ -119,22 +119,32 @@ frontend/
 │   │   └── TodoListsViewContainer/
 │   ├── hooks/
 │   ├── selectors/
-│   │   └── containers.ts           # getAppContainerProps, getTodoListsViewContainerProps
+│   │   ├── containers.ts           # getAppContainerProps, getTodoListsViewContainerProps
+│   │   └── index.ts
 │   ├── services/
 │   │   ├── offlineQueue.ts         # Offline sync queue — persisted to IndexedDB (FR-010)
 │   │   ├── offlineCache.ts         # PWA asset caching strategy
-│   │   └── serviceWorker.ts        # Service worker registration
+│   │   ├── serviceWorker.ts        # Service worker registration
+│   │   └── index.ts
+│   ├── slices/
+│   │   ├── listsSlice.ts           # ListsState, fetchLists thunk, list actions
+│   │   ├── todosSlice.ts           # TodosState, todo actions
+│   │   ├── subItemsSlice.ts        # SubItemsState, subitem actions
+│   │   ├── uiSlice.ts              # UiState (selectedListId)
+│   │   └── index.ts                # Barrel: explicit named re-exports from all slices
 │   ├── store/
-│   │   ├── store.ts                # Redux store — NO persistence middleware (constitution §III)
-│   │   └── thunks.ts               # Async thunks for read (fetchLists/Todos/Subitems) and write (create, rename, delete, reorder, toggleComplete) operations
+│   │   ├── store.ts                # configureStore only; RootState, AppDispatch, hooks
+│   │   └── index.ts                # Barrel: re-exports from store.ts
 │   ├── styles/
-│   │   └── globalStyles.ts
+│   │   ├── globalStyles.ts
+│   │   └── index.ts
 │   └── types/
-│       └── todos.ts                # Shared TypeScript types
+│       ├── todos.ts                # Shared TypeScript types
+│       └── index.ts
 ```
 *(All frontend tests are co-located in `__tests__/` folders adjacent to their artifact — no top-level `tests/` directory; constitution §IV.)*
 
-**Structure Decision**: Web application split into `frontend/` and `backend/` to align with React SPA + Node REST API requirements. The `@api` layer uses plain `fetch` calls (no RTK Query — constitution §III) split into per-entity files (`listsApi.ts`, `todosApi.ts`, `subitemsApi.ts`, `syncApi.ts`) sharing a common `apiClient.ts` wrapper. Redux store holds all fetched data as ephemeral session state. Directory layout matches constitution standards for components, containers, and selectors.
+**Structure Decision**: Web application split into `frontend/` and `backend/` to align with React SPA + Node REST API requirements. The `@api` layer uses plain `fetch` calls (no RTK Query — constitution §III) split into per-entity files (`listsApi.ts`, `todosApi.ts`, `subitemsApi.ts`, `syncApi.ts`) sharing a common `apiClient.ts` wrapper. Redux store holds all fetched data as ephemeral session state. Slice logic (state, actions, thunks) lives in `src/slices/`; `store/store.ts` is configureStore-only wiring. Every folder under `src/` contains an `index.ts` barrel with explicit named re-exports; consumers import via bare path aliases (e.g. `import { fetchLists } from '@slices'`). Directory layout matches constitution standards for components, containers, and selectors.
 
 ## Complexity Tracking
 

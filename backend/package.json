@@ -1,0 +1,42 @@
+{
+  "name": "todo-list-backend",
+  "version": "1.0.0",
+  "description": "Hierarchical Todo List REST API",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "check:versions": "node -e \"const p=require('./package.json'); const bad=[...Object.values(p.dependencies||{}),...Object.values(p.devDependencies||{})].filter(v=>v.startsWith('^')||v.startsWith('~')); if(bad.length){console.error('Version prefix found:',bad);process.exit(1);}console.log('All versions pinned exactly.');\""
+  },
+  "dependencies": {
+    "better-sqlite3": "12.6.2",
+    "body-parser": "2.2.2",
+    "cors": "2.8.6",
+    "dotenv": "17.3.1",
+    "express": "5.2.1",
+    "morgan": "1.10.1",
+    "uuid": "11.0.0",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "7.6.13",
+    "@types/cors": "2.8.19",
+    "@types/express": "5.0.6",
+    "@types/jest": "30.0.0",
+    "@types/morgan": "1.9.10",
+    "@types/node": "25.2.3",
+    "@types/uuid": "11.0.0",
+    "@typescript-eslint/eslint-plugin": "8.56.0",
+    "@typescript-eslint/parser": "8.56.0",
+    "eslint": "9.39.2",
+    "jest": "30.2.0",
+    "nodemon": "3.1.11",
+    "prettier": "3.8.1",
+    "ts-jest": "29.4.6",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3"
+  }
+}

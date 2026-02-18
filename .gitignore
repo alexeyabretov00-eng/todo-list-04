@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+frontend/dist/
+backend/dist/
+
+# Database
+backend/data/todos.db
+backend/data/*.db-shm
+backend/data/*.db-wal
+
+# Environment files
+.env
+frontend/.env
+backend/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime/cache
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+*.bak
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Coverage
+coverage/
+frontend/coverage/
+backend/coverage/
+
+# Storybook build
+frontend/storybook-static/
+
+# TypeScript incremental compilation
+*.tsbuildinfo

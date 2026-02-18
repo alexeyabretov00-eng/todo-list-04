@@ -36,7 +36,7 @@ React components MUST be "stupid" (presentational), with containers handling dat
 - **Styling**: styled-components, Ant Design component library, write own components only its not exists in Ant Design component library
 - **Forms & Validation**: react-hook-form, Zod schemas
 - **API Client**: fetch API (no CORS, same domain, dev proxy configured)
-- **Testing**: Jest (≥80% coverage), USE ts-jest, Storybook for component documentation
+- **Testing**: Jest (≥80% coverage), USE ts-jest, Storybook for component documentation. `jest.config.ts` MUST use `pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' })` from `ts-jest` to derive `moduleNameMapper` from `tsconfig.json` paths — `tsconfig.json` is the single source of truth for aliases; manual alias duplication in `jest.config.ts` is FORBIDDEN.
 - **Linting/Formatting**: ESLint, Prettier, eslint-plugin-simple-import-sort, commitlint
 - **Packages**: NPM, All npm packages MUST HAVE latest versions, Do not use prefixes in package's versions
 - **Module Resolution**: Path aliases configured in tsconfig.json and bundler:
@@ -47,8 +47,9 @@ React components MUST be "stupid" (presentational), with containers handling dat
   - `@styles` → `./src/styles`
   - `@assets` → `./src/assets`
   - `@services` → `./src/services`
-  - `@types` → `./src/types`
-  - Prefer relative paths for local imports within the same folder
+  - `@slices` → `./src/slices`
+  - `@store` → `./src/store`
+  - Do NOT add an `@types` alias — it shadows `node_modules/@types/*` and breaks type resolution for all `@types/` packages. Instead, add `src/types` to `typeRoots` in `tsconfig.json`.
   - Do NOT use trailing `/*` in aliases
 
 ### Backend Stack
@@ -61,6 +62,25 @@ React components MUST be "stupid" (presentational), with containers handling dat
 Environment-specific settings MUST be managed via `.env` files. Example: `API_PATH`, `DATABASE_URL`. Sensitive configuration MUST NOT be committed to version control.
 
 ## Development Standards
+
+### Redux Store Structure (NON-NEGOTIABLE)
+Each Redux slice MUST live in its own file under `src/slices/<name>Slice.ts`. The `store/store.ts` file MUST ONLY configure the store with `configureStore` and export `RootState`, `AppDispatch`, `useAppDispatch`, and `useAppSelector`. Slice logic (state interface, `createSlice`, `createAsyncThunk`, action creators) is FORBIDDEN in `store.ts`. Consumers import slice actions and thunks directly from `@slices`.
+
+**Required structure**:
+```
+src/
+  slices/           ← all slice files live here, NOT inside store/
+    index.ts        ← barrel: export * from each slice file
+    listsSlice.ts
+    todosSlice.ts
+    subItemsSlice.ts
+    uiSlice.ts
+  store/
+    index.ts        ← barrel: export * from './store'
+    store.ts        ← configureStore only; types; hooks
+```
+
+**Rationale**: Keeps `store.ts` focused on wiring; each slice is independently testable and discoverable; prevents the store file from growing unbounded as new features are added.
 
 ### Code Organization
 - **Frontend Components**: `components/[ComponentName]/[ComponentName].tsx` + `[ComponentName].styled.ts`
@@ -90,8 +110,9 @@ Environment-specific settings MUST be managed via `.env` files. Example: `API_PA
 - **Files**: Match component/container name exactly, styled files include `.styled.` in name
 
 ### Import/Export Conventions
-- **Named Imports/Exports**: MUST use named imports and exports exclusively. Wildcard imports (`import * as`) and wildcard exports (`export * from`) are FORBIDDEN.
-- **Rationale**: Named imports/exports provide explicit dependencies, improve tree-shaking, enable better IDE autocompletion, and make refactoring safer by catching breaking changes at compile time.
+- **Named Imports/Exports**: MUST use named imports and exports exclusively. Wildcard imports (`import * as`) are FORBIDDEN.
+- **Barrel `index.ts`**: Every folder under `src/` MUST contain an `index.ts` that re-exports all public artifacts from that folder. For aliased folders consumers import via the bare alias (`import { foo } from '@slices'`), never via deep paths (`import { foo } from '@slices/fooSlice'`). For non-aliased folders, the `index.ts` is still required so that sibling imports resolve to the folder root rather than individual files.
+- **Rationale**: Barrel files create a stable public API for each folder, enable the alias to resolve without a `/*` suffix, improve tree-shaking, and make refactoring safer by catching breaking changes at compile time.
 
 ### Data Persistence Rules
 - **Primary Data**: MUST be fetched from API, MUST NOT persist to localStorage
